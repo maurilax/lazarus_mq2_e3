@@ -1840,12 +1840,18 @@ sub event_gimme(line, ChatSender, RequestedItem)
 		/if (${Bool[${Me.Book[${RequestedItem}]}]} || ${Bool[${Me.AltAbility[${RequestedItem}]}]}) {
 
 			/if (${DebugGimme}) /echo casting "${RequestedItem}"
-			/call castSimpleSpell "${RequestedItem}" ${Me.ID}
-
+        /call check_ReadySimple "${RequestedItem}"
+        /if (${c_Ready}) {
+          /call castSimpleSpell "${RequestedItem}" ${Me.ID}
+        }
     } else /if (${Bool[${Me.Book[Summon: ${RequestedItem}]}]}) {
 
 			/if (${DebugGimme}) /echo casting "Summon: ${RequestedItem}"
-      /call castSimpleSpell "Summon: ${RequestedItem}" ${Me.ID}
+      /call check_ReadySimple "Summon: ${RequestedItem}"
+      /if (${c_Ready}) {
+        /call castSimpleSpell "Summon: ${RequestedItem}" ${Me.ID}
+      }
+
 
 		} else /if (${Bool[${Me.Book[Summon ${RequestedItemStringWithoutSummoned}]}]}) {
 
@@ -1860,16 +1866,23 @@ sub event_gimme(line, ChatSender, RequestedItem)
     } else /if (${Bool[${Me.Book[${RequestedItemStringWithoutSummoned}]}]} || ${Bool[${Me.AltAbility[${RequestedItemStringWithoutSummoned}]}]}) {
 
     	/if (${DebugGimme}) /echo casting ${RequestedItemStringWithoutSummoned}
-	    /call castSimpleSpell "${RequestedItemStringWithoutSummoned}" ${Me.ID}
+      /call check_ReadySimple "${RequestedItemStringWithoutSummoned}"
+      /if (${c_Ready}) {
+        /call castSimpleSpell "${RequestedItemStringWithoutSummoned}" ${Me.ID}
+      }
+
 
   	} else /if (${Bool[${RequestedItem.Find[Sanguine Mind Crystal]}]} && ${Bool[${Me.AltAbility[Sanguine Mind Crystal]}]}) {
 			/if (${DebugGimme}) /echo casting Sanguine Mind Crystal
-
-      /call castSimpleSpell "Sanguine Mind Crystal" ${Me.ID}
+      /call check_ReadySimple "Sanguine Mind Crystal"
+      /if (${c_Ready}) {
+         /call castSimpleSpell "Sanguine Mind Crystal" ${Me.ID}
+      }
 
     } else /if (${Bool[${RequestedItem.Find[Shuriken of Eternity]}]} && ${Bool[${FindItem[Ton Po's Mystical Pouch]}]}) {
       /if (${DebugGimme}) /echo casting Ton Po's Mystical Pouch
       /useitem "Ton Po's Mystical Pouch"
+
 
 		} else {
 			/delay 2s
@@ -2643,25 +2656,3 @@ Sub check_Basics
 
 
 /return
-
-SUB check_HCUR
-  /if (${Me.Class.ShortName.Equal[SHM]} && ${Bool[${Me.SpellInCooldown}]}) {
-    /while (${Bool[${Me.SpellInCooldown}]}) {
-      /delay 1
-    }
-  }
-  /if (${Me.Class.ShortName.Equal[RNG]} && ${Bool[${Me.SpellInCooldown}]}) {
-    /while (${Bool[${Me.SpellInCooldown}]}) {
-      /delay 1
-    }
-  }
-  /if (${Assisting} && ${Me.SpellReady[Abashi's Disempowerment]} && (${Target.Buff[Regeneration].ID} || ${Target.Buff[Scream of Hate Recourse].ID} || ${Target.Buff[Bond of Death Recourse].ID} || ${Target.Buff[Terror Leech Recourse].ID} || ${Target.Buff[Valor of Marr].ID})) {
-    /cast ${Me.Gem[Abashi's Disempowerment]}
-  }
-  /if (${Assisting} && ${Me.SpellReady[Abashi's Disempowerment]} && (${Target.Buff[Regeneration].ID} || ${Target.Buff[Scream of Hate Recourse].ID} || ${Target.Buff[Bond of Death Recourse].ID} || ${Target.Buff[Terror Leech Recourse].ID} || ${Target.Buff[Valor of Marr].ID})) {
-    /cast ${Me.Gem[Nature's Balance]}
-  }
-  /if (${Assisting} && ${Me.ItemReady[Abashi's Rod of Disempowerment]} && (${Target.Buff[Regeneration].ID} || ${Target.Buff[Scream of Hate Recourse].ID} || ${Target.Buff[Bond of Death Recourse].ID} || ${Target.Buff[Terror Leech Recourse].ID} || ${Target.Buff[Valor of Marr].ID})) {
-    /useitem "Abashi's Rod of Disempowerment"
-  }
-/RETURN

@@ -1,0 +1,47 @@
+#event FullInventory "#*#Your inventory appears full!#*#"
+
+
+
+Sub Main
+
+  /declare ItemCollectList[40] string outer
+    /varset ItemCollectList[1] "Superb Silk"
+    /varset ItemCollectList[2] "Superb Animal Pelt"
+    /varset ItemCollectList[3] "Refined Grade A Gormar Venom"
+    /varset ItemCollectList[4] "Bonded Loam"
+    /varset ItemCollectList[5] "Excellent Animal Pelt"
+    /varset ItemCollectList[6] "Tungsten Ore"
+    /varset ItemCollectList[7] "Superb Spinneret Fluid"
+    /varset ItemCollectList[8] "Uncut Black Sapphire"
+    /varset ItemCollectList[9] "Uncut Amethyst"
+    /varset ItemCollectList[10] "Uncut Goshenite"
+    /varset ItemCollectList[11] "Uncut Combine Star"
+    /varset ItemCollectList[15] "Cobalt Ore"
+    /varset ItemCollectList[14] "Uncut Jacinth"
+    /varset ItemCollectList[13] "Raw Amber Nihilite"
+    /varset ItemCollectList[12] "Excellent Silk"
+
+|ToDo
+|Need to put checks in to make sure its my bot
+|check to only do 8 (list is full)
+|loop through multiple times
+
+/declare i int
+/varset i 1
+/echo ${i}
+
+
+/for i 1 to 5
+/echo  ${ItemCollectList[${i}]}
+/delay 3
+/itemnotify ${ItemCollectList[${i}]} leftmouseup
+/delay 3
+/target ${Group.Member[1]}
+/delay 3
+/click left target
+/next i
+/delay 2
+/bct ${Target.CleanName} //notify TradeWnd TRDW_Trade_Button leftmouseup
+/delay 2
+/notify TradeWnd TRDW_Trade_Button leftmouseup
+/return

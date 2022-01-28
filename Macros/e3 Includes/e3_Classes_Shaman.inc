@@ -12,7 +12,7 @@ SUB check_Canni
           /call check_Ready "canniSpells2D" ${s}
           /if (${c_Ready}) {
             /if (${check_Mana["canniSpells2D",${s}]}) {
-            	/if (!${canniSpells2D[${s},${iCastName}].Equal[Cannibalization]} || ${Me.CurrentHPs} > 2000) {
+            	/if (!${canniSpells2D[${s},${iCastName}].Equal[Cannibalization]} || ${Me.CurrentHPs} > 6000) {
 								/if (${canniSpells2D[${s},${iMinHP}]} <= ${Me.PctHPs}) {
               		/call e3_Cast ${Me.ID} "canniSpells2D" ${s}
                 }
@@ -30,7 +30,7 @@ Sub SHM_Setup
 /if (${Debug}) /echo |- SHM_Setup ==>
 	/call iniToVarV "${Character_Ini},Shaman,Auto-Canni (On/Off)" AutoCanni bool outer
 	/call IniToArrayV "${Character_Ini},Shaman,Canni#" canniSpells
-  	/if (${canniSpells.Size}) /call BuildSpellArray "canniSpells"	"canniSpells2D"	
+  	/if (${canniSpells.Size}) /call BuildSpellArray "canniSpells"	"canniSpells2D"
 /if (${Debug}) /echo <== SHM_Setup -|
 /return
 |----------------------------------------------------------------------------|
@@ -65,12 +65,8 @@ sub Event_AE_AA(string line)
 	/if (${Me.Class.ShortName.Equal[SHM]}) {
    /if (${Me.AltAbilityReady[Mass Group Buff]} && ${Me.AltAbilityReady[Ancestral Aid]}) {
      /bc MGB Ancestral Aid inc...
-     /casting "Mass Group Buff|alt" -maxtries|3
-     /delay 5 !${Me.AltAbilityReady[Mass Group Buff]}
-     /delay 5
-     /casting "Ancestral Aid|alt" -maxtries|3
-     /delay 5 !${Me.AltAbilityReady[Ancestral Aid]}
-     /casting "Ancestral Aid|alt" -maxtries|3
+	 /call castSimpleSpell "Mass Group Buff" 0
+     /call castSimpleSpell "Ancestral Aid" 0
      /rs MGB Ancestral Aid inc...
    } else /if (!${Me.AltAbilityReady[Mass Group Buff]}) {
       /bc Mass Group Buff is not available...

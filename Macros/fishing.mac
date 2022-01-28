@@ -1,0 +1,144 @@
+#turbo 20
+
+|Forage Macro by Wirlin
+|Auto adds items foraged to Fishing.ini
+|Set items to 0 to have them destroyed
+|Set items to 1 to have them kept
+|to write to ini
+|/ini "filename" "keyname" "valuename" "value"
+|example
+|/ini "Fishing.ini "Default" "MaxSave" "1"
+|to read from ini
+|string Ini[filename,section,key,default]
+|example 
+|/varset ItemSetting ${Ini[Fishing.ini,FishingList,${Cursor.Name},${NotFound}]}
+|Since ${NotFound} is -1 it skips that part and puts in the new value in that place
+|
+
+#event BrokenPole "#*#You can't fish without a fishing pole, go buy one.#*#"
+#event NoBait "#*#You can't fish without fishing bait, go buy some.#*#"
+
+Sub Main
+
+/declare DefaultMaxSave int outer 
+
+    /varset DefaultMaxSave ${Ini[Fishing.ini,Default,MaxSave,${NotFound}]} 
+    /if (${DefaultMaxSave}==${NotFound}) { 
+       /ini "Fishing.ini" "Default" "MaxSave" "1" 
+        /varset DefaultMaxSave 1
+     }
+
+   :Loop
+      /call CheckPole
+      /doevents
+      /delay 1s
+      /if (${Cursor.ID}) /call ItemFished
+      /if (${Me.AbilityReady[Fishing]}) /doability Fishing
+      /delay 68
+      /if (${Cursor.ID}) /call ItemFished
+      /delay 10s
+   /goto :Loop
+/delay 10s
+/goto :Loop
+/return
+
+Sub ItemFished
+
+   /declare ItemSetting int local
+   /declare NotFound int local
+ 
+   /varset NotFound -1
+ 
+     :Loot
+|Look up item in Fishing.ini
+
+   /varset ItemSetting ${Ini[Fishing.ini,FishingList,${Cursor.Name},${NotFound}]}
+   /delay 1s
+
+| If the item isn't in the .ini file then add it.
+   /if (${ItemSetting}==${NotFound}) {
+     /ini "Fishing.ini" "FishingList" "${Cursor.Name}" "${DefaultMaxSave}"
+     /varset ItemSetting ${DefaultMaxSave}
+     /delay 1s
+	}
+| If keeping it stash it in a bag otherwise destroy it
+  /if (${ItemSetting}>0) {
+     /popup Keeping ${Cursor.Name}
+     /autoinventory
+     /delay 1s
+        } else {
+     /popup Destroying ${Cursor.Name}
+     /destroy
+     /delay 1s 
+   }
+/return
+
+Sub CheckPole
+   /if (${Me.Inventory[mainhand].Name.Find[Fishing Pole]}) /return
+   /echo Digging in your pants to find your pole.
+   /delay 1s
+   /keypress OPEN_INV_BAGS
+   /delay 1s
+
+/if (${FindItemCount[Fishing Pole]}>0) {
+		/delay 1s
+		/nomodkey /ctrl /itemnotify ${FindItem[Fishing Pole].InvSlot} leftmouseup
+		/delay 1s
+		/nomodkey /itemnotify mainhand leftmouseup
+		/delay 1s
+		/autoinv
+		/delay 1s
+		/keypress CLOSE_INV_BAGS
+		/echo ${Me.Inventory[mainhand]} in hand.
+		/return
+	}
+/if (${FindItemCount[Brell's Fishin' Pole]}>0) {
+		/delay 1s
+		/nomodkey /ctrl /itemnotify ${FindItem[Brell's Fishin' Pole].InvSlot leftmouseup
+		/delay 1s
+		/nomodkey /itemnotify mainhand leftmouseup
+		/delay 1s
+		/autoinv
+		/delay 1s
+		/keypress CLOSE_INV_BAGS
+		/echo ${Me.Inventory[mainhand]} in hand.
+		/return
+	}
+/if (${FindItemCount[Fisherman's Companion]}>0) {
+		/delay 1s
+		/nomodkey /ctrl /itemnotify ${FindItem[Fisherman's Companion].InvSlot} rightmouseup
+		/delay 12s
+		/nomodkey /itemnotify mainhand leftmouseup
+		/delay 1s
+		/autoinv
+		/delay 1s
+		/keypress CLOSE_INV_BAGS
+		/echo ${Me.Inventory[mainhand]} in hand.
+		/return
+	}
+   /echo Your pole has gone limp.
+/endmacro
+
+Sub Event_BrokenPole
+	/call CheckPole
+/return
+
+Sub Event_NoBait
+
+/delay 1s
+/if (${FindItemCount[Hagar Brand Fishing Pail]}>0) {
+		/keypress OPEN_INV_BAGS
+		/delay 1s
+		/nomodkey /itemnotify ${FindItem[Hagar Brand Fishing Pail].InvSlot} rightmouseup
+		/delay 6s
+		/autoinv
+		/keypress CLOSE_INV_BAGS
+		/return
+	} else {
+	/delay 1s
+	/echo Out of Bait
+	}
+   /endmacro
+
+/return
+/end

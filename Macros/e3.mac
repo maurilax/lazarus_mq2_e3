@@ -26,7 +26,7 @@ SUB Main(modeSelect)
 :MainLoop
 /if (${Debug}) /echo |- MainLoop ==>
 		/varset ActionTaken FALSE
-    
+
     /call check_Basics
  		/call check_Active
 		/call check_Idle
@@ -49,7 +49,7 @@ SUB Main(modeSelect)
           /doevents nowCast
 				  |check to see if we have spell(s) ready in nowCast that may have interrupted the above call
           /call castNowSpells
-        } 
+        }
       /if (!${ActionTaken}) /next i
 
       /if (${Me.CombatState.NotEqual[COMBAT]}) {
@@ -58,7 +58,7 @@ SUB Main(modeSelect)
           /if ((${Me.PctMana} < ${autoMedPctMana} && ${Me.MaxMana} > 1 && ${autoMedChar}) || (${Me.PctEndurance} < ${autoMedPctMana} && ${autoMedChar})) {
             /varset medBreak TRUE
 			/if ((${Defined[AssistType]}) && (${Select[${Me.Class.ShortName},CLR,DRU,ENC,MAG,NEC,SHM,WIZ]})) {
-			  /varset AssistType Off 
+			  /varset AssistType Off
 			} else {
 			  /declare AssistType string Off
 			}
@@ -76,7 +76,7 @@ SUB Main(modeSelect)
 	/echo <== MainLoop -|
 	/delay 5
 }
-/goto :MainLoop	
+/goto :MainLoop
 /RETURN
 
 |----------------------------------------------------------------------------------------------------------------|

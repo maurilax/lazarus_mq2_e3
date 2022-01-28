@@ -1,0 +1,11 @@
+
+items.txt
+*.dmp
+.DS_Store
+*.navmesh
+*.json
+Creamo_Utilities/GameParse/GamParse-2.0.0-Beta.exe
+*.exe
+MQ2Nav.log
+MQ2LinkDB.txt
+MQ2AutoLogin.ini

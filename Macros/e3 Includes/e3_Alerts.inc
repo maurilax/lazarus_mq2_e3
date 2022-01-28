@@ -81,8 +81,16 @@ SUB alerts_Background_Events
 
   /if (${Zone.ShortName.Equal[anguish]}) {
     /doevents angmask
+    /doevents ture_ramp
   } else {
     /doevents angmask flush
+    /doevents ture_ramp flush
+}
+
+/if (${Zone.ShortName.Equal[poknowledge]}) {
+/doevents ture_ramp2
+} else {
+/doevents ture_ramp2 flush
   }
 /RETURN
 
@@ -112,7 +120,8 @@ Sub event_angmask
     /delay 3s !${Me.Casting.ID}
     :retry
     /varcalc numtries ${numtries}+1
-    /casting "Mirrored Mask" -maxtries|3
+    /call castSimpleSpell "Mirrored Mask" 0
+    |/casting "Mirrored Mask" -maxtries|3
     /delay 1s
     /if (!${Bool[${Me.Song[Reflective Skin]}]} && ${numtries} < 8) /goto :retry
   }
@@ -120,6 +129,21 @@ Sub event_angmask
   /rs ~~~Mask on Me~~~ Ready: ${Me.ItemReady[Mirrored Mask]}
 /return
 
+#event ture_ramp "#*#Ture roars with fury as it surveys its attackers#*#"
+Sub event_ture_ramp
+	/if (${Zone.ShortName.Equal[anguish]}) {
+		/gsay MOVE MOVE MOVE!
+    /bcg //moveto loc 2859, 527
+	}
+/return
+
+|#event ture_ramp2 "#*#testingstuff#*#"
+|Sub event_ture_ramp2
+|	/if (${Zone.ShortName.Equal[poknowledge]}) {
+|		/gsay MOVE MOVE MOVE!
+|    /bcga //moveto loc 194, 230
+|	}
+|/return
 
 #event tactics_stampede "#*#You hear the pounding of hooves#*#"
 Sub event_tactics_stampede

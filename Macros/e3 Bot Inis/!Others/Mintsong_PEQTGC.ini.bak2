@@ -1,0 +1,13 @@
+[Buffs]
+Self Buff=Bottomless Venom Vial
+[Bard]
+Auto-Melody=Base
+Auto-Sonata (On/Off)=Off
+SongPlayer=Dynamo
+DynamoPrecastTime=1
+[Base Melody]
+Song=Lute of the Flowing Waters/Gem|21
+Song=Psalm of Veeshan/Gem|1
+Song=Niv's Harmonic/Gem|2
+Song=Storm Blade/Gem|3
+Song=War March of Muram/Gem|4

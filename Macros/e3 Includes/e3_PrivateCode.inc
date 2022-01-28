@@ -146,3 +146,26 @@ SUB check_Manastone
     |delay 0.3 sec for the spells that may come after this method call
     /delay 3
 /RETURN
+
+
+SUB check_HCUR
+  /if (${Me.Class.ShortName.Equal[SHM]} && ${Bool[${Me.SpellInCooldown}]}) {
+    /while (${Bool[${Me.SpellInCooldown}]}) {
+      /delay 1
+    }
+  }
+  /if (${Me.Class.ShortName.Equal[RNG]} && ${Bool[${Me.SpellInCooldown}]}) {
+    /while (${Bool[${Me.SpellInCooldown}]}) {
+      /delay 1
+    }
+  }
+  /if (${Assisting} && ${Me.SpellReady[Abashi's Disempowerment]} && (${Target.Buff[Regeneration].ID} || ${Target.Buff[Scream of Hate Recourse].ID} || ${Target.Buff[Bond of Death Recourse].ID} || ${Target.Buff[Terror Leech Recourse].ID} || ${Target.Buff[Valor of Marr].ID})) {
+    /cast ${Me.Gem[Abashi's Disempowerment]}
+  }
+  /if (${Assisting} && ${Me.SpellReady[Abashi's Disempowerment]} && (${Target.Buff[Regeneration].ID} || ${Target.Buff[Scream of Hate Recourse].ID} || ${Target.Buff[Bond of Death Recourse].ID} || ${Target.Buff[Terror Leech Recourse].ID} || ${Target.Buff[Valor of Marr].ID})) {
+    /cast ${Me.Gem[Nature's Balance]}
+  }
+  /if (${Assisting} && ${Me.ItemReady[Abashi's Rod of Disempowerment]} && (${Target.Buff[Regeneration].ID} || ${Target.Buff[Scream of Hate Recourse].ID} || ${Target.Buff[Bond of Death Recourse].ID} || ${Target.Buff[Terror Leech Recourse].ID} || ${Target.Buff[Valor of Marr].ID})) {
+    /useitem "Abashi's Rod of Disempowerment"
+  }
+/RETURN

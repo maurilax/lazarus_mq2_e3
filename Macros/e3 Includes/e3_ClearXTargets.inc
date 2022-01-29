@@ -33,6 +33,7 @@
 |--------------------------------------------------------------------------------|
 SUB clearXTargets_Setup
 	/declare ClearXTargetsOn bool outer FALSE
+	/declare ClearXStick bool outer FALSE
 	/declare ClearXTargetsDebug bool outer FALSE
   /declare NumAggroTargets int outer 0
   /declare KeepAggroOn bool outer FALSE
@@ -128,7 +129,7 @@ SUB event_nextTarget(line, ChatSender)
   /if (${Bool[${mobId}]} && ${Bool[${Spawn[${mobId}]}]}) {
     /if (${ClearXTargetsDebug}) /echo Assisting on Next Target ${Spawn[${mobId}].CleanName} TargetID=${mobId}
     /call TrueTarget ${mobId}
-    |/stick id ${mobId} ${ClearXTargetStickDistance} uw
+    /if (${ClearXStick}) /stick id ${mobId} ${ClearXTargetStickDistance} uw
     /delay 1
     /attack on
     /delay 1
@@ -157,10 +158,10 @@ SUB event_faceTargetClearXTargets
 | Re-stick if too far away msg
 #event getCloserClearXTargets "Your target is too far away, get closer!"
 SUB event_getCloserClearXTargets
-	/if (${Bool[${AssistTarget}]}) {
+	/if (${Bool[${AssistTarget}]} && ${ClearXStick}) {
 		/doevent flush event_getCloserClearXTargets
 		/if (${ClearXTargetsDebug}) /echo ClearXTargets: Re-sticking to target ${Spawn[id ${AssistTarget}].CleanName}
-		|/stick id ${AssistTarget} 5 uw
+		/stick id ${AssistTarget} 5 uw
 	}
 /RETURN
 
@@ -249,7 +250,7 @@ SUB event_rotateTarget(line, ChatSender)
   /if (${Bool[${mobId}]} && ${Bool[${Spawn[${mobId}]}]}) {
     /if (${ClearXTargetsDebug}) /echo Assisting on Next Rotate Target ${Spawn[${mobId}].CleanName} TargetID=${mobId}
     /call TrueTarget ${mobId}
-    |/stick id ${mobId} ${ClearXTargetStickDistance} uw
+    /if (${ClearXStick}) /stick id ${mobId} ${ClearXTargetStickDistance} uw
     /delay 1
     /attack on
     /delay 1

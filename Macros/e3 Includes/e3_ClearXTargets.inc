@@ -99,9 +99,11 @@ SUB event_clearXTargets(line, ChatSender, args)
     | Disable follow to stop melee/ranged toons bouncing
     /stop
   	/echo ClearXTargets: Enabled ${ClearXTargetsOn}
+		/g ClearXTargets: Enabled <<<${ClearXTargetsOn}>>>
   } else {
     /varset ClearXTargetsOn FALSE
 	  /echo ClearXTargets: Disabled
+		/g ClearXTargets: Disabled <<<${ClearXTargetsOn}>>>
   }
 /RETURN
 

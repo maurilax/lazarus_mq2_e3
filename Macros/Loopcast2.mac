@@ -1,0 +1,27 @@
+#event OutOfStuff "You are missing some required components."
+
+Sub Main(gemNumber, delay)
+	
+	:Loop
+	/if (${Cursor.ID}) /autoinv
+	/doevents
+	| med if i don't have enough mana to cover the fizzle
+	/while (${Me.CurrentMana} < ${Math.Calc[${Me.Gem[${gemNumber}].Mana} * 1.25]}) {
+		/if (!${Me.Sitting}) /sit on
+		/delay 1s
+		/goto :Loop
+	}
+	/delay ${delay}
+	/if (!${Me.SpellReady[${gemNumber}]}) {
+		/if (${Cursor.ID}) /autoinv
+		/goto :Loop
+	} else {
+		/cast ${gemNumber}
+		/delay 10s !${Me.Casting.ID}
+		/goto :Loop
+	}
+/return
+
+Sub Event_OutOfStuff 
+/endmacro 
+/return

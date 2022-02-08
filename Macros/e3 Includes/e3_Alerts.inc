@@ -129,11 +129,11 @@ Sub event_angmask
   /rs ~~~Mask on Me~~~ Ready: ${Me.ItemReady[Mirrored Mask]}
 /return
 
-#event ture_ramp "#*#Ture roars with fury as it surveys its attackers#*#"
+#event ture_ramp "#*#roars with fury as it surveys its attackers#*#"
 Sub event_ture_ramp
 	/if (${Zone.ShortName.Equal[anguish]}) {
-		/gsay MOVE MOVE MOVE!
-    /bcg //moveto loc 2859, 527
+		/popup >>^<<  MOVE MOVE MOVE! >>^<<
+    /bct minty //moveto loc 2859, 527
 	}
 /return
 

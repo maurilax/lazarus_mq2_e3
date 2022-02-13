@@ -6,6 +6,6 @@ REM tasklist /nh /fi " IMAGENAME eq GamParse-1.5.1.7.exe" | find /i "GamParse-1.
 REM C:\Users\Joe\AppData\Local\atom\atom.exe
 
 tasklist /nh /fi "WINDOWTITLE eq Mintman" | find /i "eqgame.exe" > nul ||(start "Mintman" /High /d "C:\RoF2WAR" "C:\RoF2WAR\eqgame.exe" patchme /Login:maurilax) && (timeout /t 8)
-tasklist /nh /fi "WINDOWTITLE eq Mintbank" | find /i "eqgame.exe" > nul ||(start "Mintbank" /High /d "C:\RoF2" "C:\RoF2\eqgame.exe" patchme /Login:maurilax13) && (timeout /t 8)
-tasklist /nh /fi "WINDOWTITLE eq Mintfu" | find /i "eqgame.exe" > nul ||(start "Mintfu" /High /d "C:\RoF2" "C:\RoF2\eqgame.exe" patchme /Login:maurilax5) && (timeout /t 8)
-tasklist /nh /fi "WINDOWTITLE eq Mintsong" | find /i "eqgame.exe" > nul ||(start "Mintsong" /High /d "C:\RoF2" "C:\RoF2\eqgame.exe" patchme /Login:maurilax9) && (timeout /t 8)
+REM tasklist /nh /fi "WINDOWTITLE eq Mintbank" | find /i "eqgame.exe" > nul ||(start "Mintbank" /High /d "C:\RoF2" "C:\RoF2\eqgame.exe" patchme /Login:maurilax13) && (timeout /t 8)
+REM tasklist /nh /fi "WINDOWTITLE eq Mintfu" | find /i "eqgame.exe" > nul ||(start "Mintfu" /High /d "C:\RoF2" "C:\RoF2\eqgame.exe" patchme /Login:maurilax5) && (timeout /t 8)
+REM tasklist /nh /fi "WINDOWTITLE eq Mintsong" | find /i "eqgame.exe" > nul ||(start "Mintsong" /High /d "C:\RoF2" "C:\RoF2\eqgame.exe" patchme /Login:maurilax9) && (timeout /t 8)

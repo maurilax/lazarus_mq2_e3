@@ -147,6 +147,13 @@ SUB check_Manastone
     /delay 3
 /RETURN
 
+|/delay 4s
+|/target 66 NPC
+|/target 67 NPC
+|/target 68 NPC
+|/bcga //nav spawn id ${Target.ID}
+|/varset ClearXTargetsOn TRUE
+|/varset ClearXStick TRUE
 
 SUB check_HCUR
   /if (${Me.Class.ShortName.Equal[SHM]} && ${Bool[${Me.SpellInCooldown}]}) {

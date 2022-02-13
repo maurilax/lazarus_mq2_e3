@@ -1,0 +1,31 @@
+/tar De`van Szostek
+/itemnotify "Xenaida's Writings" leftmouseup
+/itemnotify "Wijdan's Writings" leftmouseup
+/itemnotify "Rytan's Writings" leftmouseup
+/itemnotify "Kaikachi's Writings" leftmouseup
+/itemnotify "Vahlara's Writings" leftmouseup
+/itemnotify "Frizznik's Writings" leftmouseup
+/itemnotify "Zajeer's Writings" leftmouseup
+/itemnotify "Valtron's Writings" leftmouseup
+
+
+/tar Sophia Florence
+/itemnotify "Lyndro's Writings" leftmouseup
+
+/tar Verna Abella
+/itemnotify "Silius' Writings" leftmouseup
+
+/tar Aprilia Marrow
+/itemnotify "Prathun's Writings" leftmouseup
+
+/tar Jenna Gurell
+/itemnotify "Rashere's Writings" leftmouseup
+
+/tar Gizzmu the Wise
+/itemnotify "Maddoc's Writings" leftmouseup
+
+/tar Irena Pereira
+/itemnotify "Absor's Writings" leftmouseup
+
+Hail, De`van Szostek
+My task is complete.

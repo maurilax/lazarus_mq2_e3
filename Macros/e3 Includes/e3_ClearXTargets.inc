@@ -130,11 +130,8 @@ SUB event_nextTarget(line, ChatSender)
     /if (${ClearXTargetsDebug}) /echo Assisting on Next Target ${Spawn[${mobId}].CleanName} TargetID=${mobId}
     /call TrueTarget ${mobId}
     /if (${ClearXStick}) /stick id ${mobId} ${ClearXTargetStickDistance} uw
-    /delay 1
+  |  /delay 1
     /attack on
-    /delay 1
-    /bcga //pet attack
-    /delay 1
     /assistme
     /varset AllowControl TRUE
     /varset AssistStickDistance ${ClearXTargetStickDistance}
@@ -190,16 +187,18 @@ SUB check_clearXTargets
     | If there are any aggro targets call Next Target
     | If there are none, disable Clear XTargets
     /if (${NumAggroTargets} > 0) {
-      /bc Next Target
+			/bc Next Target
       /return
     }
 
   	| No target found, disable clearing
     /varset ClearXTargetsOn FALSE
     /echo ClearXTargets: XTargets Cleared, disabled Clear XTarget
+		/bc loot on
+
     /if (${FollowAfterClearXTargets}) {
       | If set to follow after clearing
-      /followme
+			/followme
     }
     /attack off
   }
@@ -251,11 +250,8 @@ SUB event_rotateTarget(line, ChatSender)
     /if (${ClearXTargetsDebug}) /echo Assisting on Next Rotate Target ${Spawn[${mobId}].CleanName} TargetID=${mobId}
     /call TrueTarget ${mobId}
     /if (${ClearXStick}) /stick id ${mobId} ${ClearXTargetStickDistance} uw
-    /delay 1
+    |/delay 1
     /attack on
-    /delay 1
-    /bcga //pet attack
-    /delay 1
     /assistme
     /varset AllowControl TRUE
     /varset AssistStickDistance ${ClearXTargetStickDistance}

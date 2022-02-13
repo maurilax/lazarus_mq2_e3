@@ -25,7 +25,7 @@ REM tasklist /nh /fi "WINDOWTITLE eq Resheo" | find /i "eqgame.exe" > nul ||(sta
 REM tasklist /nh /fi "WINDOWTITLE eq Verdant" | find /i "eqgame.exe" > nul ||(start "Resheo" /High /d "C:\RoF2" "C:\RoF2\eqgame.exe" patchme /Login:46290dru) && (timeout /t 8)
 REM tasklist /nh /fi "WINDOWTITLE eq Remarkable" | find /i "eqgame.exe" > nul ||(start "Remarkable" /High /d "C:\RoF2" "C:\RoF2\eqgame.exe" patchme /Login:dazzle01) && (timeout /t 8)
 REM tasklist /nh /fi "WINDOWTITLE eq Moshend" | find /i "eqgame.exe" > nul ||(start "Moshend" /High  /d "C:\RoF2" "C:\RoF2\eqgame.exe" patchme /Login:samadcit4) && (timeout /t 8)
-REM tasklist /nh /fi "WINDOWTITLE eq Oversanai" | find /i "eqgame.exe" > nul ||(start "Remarkable" /High /d "C:\RoF2" "C:\RoF2\eqgame.exe" patchme /Login:samadcit2) && (timeout /t 8)
+REM tasklist /nh /fi "WINDOWTITLE eq Oversanai" | find /i "eqgame.exe" > nul ||(start "Oversanai" /High /d "C:\RoF2" "C:\RoF2\eqgame.exe" patchme /Login:samadcit2) && (timeout /t 8)
 REM tasklist /nh /fi "WINDOWTITLE eq Stabhard" | find /i "eqgame.exe" > nul ||(start "Stabhard" /High /d "C:\RoF2" "C:\RoF2\eqgame.exe" patchme /Login:dazzle05) && (timeout /t 8)
 REM tasklist /nh /fi "WINDOWTITLE eq Stayback" | find /i "eqgame.exe" > nul ||(start "Stayback" /High /d "C:\RoF2" "C:\RoF2\eqgame.exe" patchme /Login:dazzle04) && (timeout /t 8)
 REM tasklist /nh /fi "WINDOWTITLE eq Longbowjim" | find /i "eqgame.exe" > nul ||(start "Stayback" /High /d "C:\RoF2" "C:\RoF2\eqgame.exe" patchme /Login:dazzle06) && (timeout /t 8)

@@ -133,7 +133,7 @@ Sub event_angmask
 Sub event_ture_ramp
 	/if (${Zone.ShortName.Equal[anguish]}) {
 		/popup >>^<<  MOVE MOVE MOVE! >>^<<
-    /bct minty //moveto loc 2859, 527
+    |/if (${Group.Leader.Name.Equal[${Me}]}) /bcg //moveto loc 2859, 527
 	}
 /return
 

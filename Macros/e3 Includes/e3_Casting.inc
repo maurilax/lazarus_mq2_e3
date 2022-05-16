@@ -30,12 +30,12 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 |StopEchos = Skips the /echo on successful cast if a value other than 0 is passed with the /call e3_Cast
 /if (${Debug} || ${Debug_Casting}) /echo |- e3_Cast ==>
 
-	/varset castReturn  
+	/varset castReturn
 	|if we are a bard, and not doing async twisting this section of code
 	|will 'block' as the check_BardSongs does not block on its call.
 	|this allows other check_ Methods to run to do their computation while the spell is running
 	|if they have to do an e3_Cast for their stuff, they will block here until the song is complete
-	|if they don't do anything, it ends up blocking back in check_BardSongs for the next song on the list. 
+	|if they don't do anything, it ends up blocking back in check_BardSongs for the next song on the list.
 	/if (!${Twist.Twisting} && ${Me.Class.ShortName.Equal[BRD]}) {
 
 		/call BardSongWaitLockPumpQueue
@@ -68,14 +68,14 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 	/declare oldItem string local
 	/declare i	int local
 	/declare reEnableTwist bool local FALSE
-	|this needs to be set to true every run, as its checked for interrupt method calls. Technically they set it to true every time they run, but best to 
+	|this needs to be set to true every run, as its checked for interrupt method calls. Technically they set it to true every time they run, but best to
 	|be sure this is reset.
 	/varset c_SubToRun TRUE
-	
+
 
   |/varset Debug_Casting TRUE
- 
- 
+
+
 	|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	| Checks to abort casting due to previous failures
 	|if im invis and iCastInvis=0 (default except for heals)
@@ -106,13 +106,13 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 	/if (${Select[${pendingCastID}_${castTargetName},${immuneList}]} && !${pendingCast.Equal[${spammableSpell}]}) {
 		/varset castReturn CAST_IMMUNE
     /if (${Debug} || ${Debug_Casting}) /echo SkipCast-Immune ${pendingCast} ${pendingCastID} ${Spawn[id ${targetID}].Name} ${targetID}
-		/goto :skipCast 		
+		/goto :skipCast
 	}
 	|- Check for spells listed in the failureList: reset on zone
 	/if (${Select[${${ArrayName}[${ArrayIndex},${iCastName}]},${failureList}]}) {
 		/varset castReturn FAILURELIST
     /if (${Debug} || ${Debug_Casting}) /echo SkipCast-Failure ${pendingCast} ${pendingCastID} ${Spawn[id ${targetID}].Name} ${targetID}
-		/goto :skipCast 
+		/goto :skipCast
 	}
 	|- Reagent Check *|
 	/if (${Bool[${${ArrayName}[${ArrayIndex},${iReagent}]}]}) {
@@ -135,7 +135,7 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
     /goto :skipCast
   }
 
-|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~		
+|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 |  Basic Checks
 :wait_for_misc
   /if (${${ArrayName}[${ArrayIndex},${iTargetType}].Find[pet]}) {
@@ -169,7 +169,7 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
     }
   }
 
-	
+
 
 	/declare startingLoc ${Me.Loc.Replace[ ,]}
 |~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -177,7 +177,7 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 :cast_spell
   |/if (${Me.Name.Equal[Lube]}) /gu Casting ${pendingCast} ${pendingCastID} ${Spawn[id ${targetID}].Name} ${targetID}
 	/if (!${${ArrayName}[${ArrayIndex},${iCastType}].Equal[Ability]}) {
-		
+
 		/if (!${StopEchos}) /echo [${Time}]: ${pendingCast} ${pendingCastID} ${Spawn[id ${targetID}].Name} ${targetID}  (${Math.Calc[${e3_CastTime}/1000]}sec)
 	}
 	|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -217,9 +217,9 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 				/call pauseTwist
 				/delay 3s !${Me.Casting.ID}
 				/delay 3
-			} 
+			}
 		}
-	
+
 		|- Stop following for spell/item/aa with a cast time > 0 MyCastTime, unless im a bard
 		/if (${${ArrayName}[${ArrayIndex},${iMyCastTime}]} >0 && ${Me.Class.ShortName.NotEqual[BRD]}) {
 			/if (${Stick.Status.Equal[on]}) /squelch /stick pause
@@ -229,7 +229,7 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 		}
 		|- Equip an item that must be equipped to cast and is not currently equipped.  must use base inventory slots 24 through 31
 	    /if (${Bool[${${ArrayName}[${ArrayIndex},${iItemMustEquip}]}]}) {
-			
+
 			/if (${FindItem[=${pendingCast}].ItemSlot} >=23) {
         	/varset oldItem ${Me.Inventory[${${ArrayName}[${ArrayIndex},${iItemMustEquip}]}].Name}
         	/call WriteToIni "${MacroData_Ini},${Me.CleanName}-${MacroQuest.Server},Pending Exchange" "${oldItem}/${${ArrayName}[${ArrayIndex},${iItemMustEquip}]}" 1
@@ -239,10 +239,10 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 		|- Define item|alt|gem# parameter
 		/if (${${ArrayName}[${ArrayIndex},${iCastType}].Equal[AA]}) {
 			/varset pendingType alt
-			
+
 		} else /if (${${ArrayName}[${ArrayIndex},${iCastType}].Equal[Item]}) {
 			/varset pendingType item
-			
+
 		} else /if (${${ArrayName}[${ArrayIndex},${iCastType}].Equal[Spell]}) {
 			|- if Gem specified, use it, else use default
 			/if (${${ArrayName}[${ArrayIndex},${iSpellGem}]}) {
@@ -253,11 +253,11 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 		}
 		|/echo AT pendingCastID ${pendingCastID} pendingType ${pendingType}" "-targetid|${targetID}"
 		/varset ActionTaken TRUE
-		|to help with item clicks locking up, to give the server time to issue the cooldown.	
+		|to help with item clicks locking up, to give the server time to issue the cooldown.
    		/if (${pendingType.Equal[item]}) {
    			|When an item delay is applied to an entry, check to see if the delay is still active
 			/if (${Defined[SpellRecast_${pendingCastID}]}) {
-				
+
 			/if (${SpellRecast_${pendingCastID}}) {
 				|our timer is still active, skip this and say we are not recovered yet.
 				|No action taken, so they can cast the next thing in the list.
@@ -268,9 +268,9 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 			}
 			}
 		}
-		
+
 		/if (${${ArrayName}[${ArrayIndex},${iTargetType}].Equal[Self]}) {
-			
+
 			|bards songs don't work with /casting, have to do it ourselves
 			/if (${Bool[${Me.Book[${pendingCast}]}]} && ${Me.Class.ShortName.Equal[BRD]}) {
 				/echo e3_Cast issuing a raw cast for :"${pendingCast}"
@@ -306,15 +306,15 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 					}
 				}
 			}
-			
+
 		} else {
-			
+
 			|bards songs don't work with /casting, have to do it ourselves
 			/if (${Bool[${Me.Book[${pendingCast}]}]} && ${Me.Class.ShortName.Equal[BRD]}) {
 				/cast "${pendingCast}"
-               
+
                 /delay 5 ${Window[CastingWindow].Open}
-                
+
                 /if (!${Window[CastingWindow].Open}) {
                     /stopcast
                     /delay 1
@@ -328,7 +328,7 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 			} else {
 				/casting "${pendingCast}|${pendingType}" "-targetid|${targetID}"
 			}
-			
+
 			|delay 3 is enough time to have result come back with fizzle
 			/delay 3
 			/declare castWindowWaitCounter int local 0
@@ -346,7 +346,7 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 					}
 				}
 			}
-			
+
 		}
 		|- Memorizing spell
 		/if (${Cast.Status.Find[M]}) /delay 3s !${Cast.Status.Find[M]}
@@ -356,15 +356,15 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 		|/echo checking if window is open
 :cast_still_pending
 |- check for reasons to cancel casting
-		
+
 		/if (${Window[CastingWindow].Open}) {
-		 
+
 		  |dont allow item swap/must equip interrupts to avoid crashes
 			|/echo checking is still open
 		   	/if (${Me.Class.ShortName.Equal[BRD]}) {
 				 /call ActivateSelosKick
 		   }
-		 	
+
 
 			/if (${oldItem.Length} || ${e3_CastNoInterrupt}) {
 				/delay 1
@@ -375,9 +375,9 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 			   |- Run SubToRun
 			    |/varset Debug_Casting TRUE
 				|allow nothing to interrupt this.
-			
+
 				/if (${Bool[${${ArrayName}[${ArrayIndex},${iSubToRun}]}]}) {
-					
+
 					|call interrupt check
 					/call ${${ArrayName}[${ArrayIndex},${iSubToRun}]} ${ArrayName} ${ArrayIndex}
 
@@ -422,7 +422,7 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 				}
 				|- goose
 				/if (${Me.State.Equal[DUCK]}) {
-					
+
 					/if (${Debug} || ${Debug_Casting}) /echo duck called interrupt
 							/call interrupt
 							/varset castReturn CAST_INTERRUPTED
@@ -448,7 +448,7 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 				}
 						|-Moved since casting began
 				/if (${castEndTime}>5) {
-					
+
 					/if (${Math.Distance[${startingLoc}]}>=8) {
 						/if (${Debug} || ${Debug_Casting}) /echo moved 8+ units after casting: called interrupt
 						/call interrupt
@@ -471,11 +471,11 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 			}
 			/goto :cast_still_pending
 		}
-		
+
   :interrupted
 		|only check casting if its not a bard spell, as it uses raw /cast
-		/if (!(${Bool[${Me.Book[${pendingCast}]}]} && ${Me.Class.ShortName.Equal[BRD]})) { 
-			|At this point the cast window is closed, but we may need to delay to get the result. 
+		/if (!(${Bool[${Me.Book[${pendingCast}]}]} && ${Me.Class.ShortName.Equal[BRD]})) {
+			|At this point the cast window is closed, but we may need to delay to get the result.
 			|note, if we don't find the result in 2 seconds, soemthing has gone wrong
 			|it will use the previous cast return instead. There is a bug here for item lockups
 			|so we let this continue to loop back around and remove the item lock
@@ -499,7 +499,7 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 				}
 			} else /if (${Select[${castReturn},CAST_OUTDOORS,CAST_COMPONENTS,CAST_UNKNOWN]}) {
 				/docommand ** ${ChatToggle} Adding to failureList due to Return Events CAST_OUTDOORS,CAST_COMPONENT,CAST_UNKNOWN
-				/varset failureList ${failureList}${pendingCastID},		
+				/varset failureList ${failureList}${pendingCastID},
 			}
 		}
   }
@@ -513,16 +513,16 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
  	|if the twist was stopped for this.
 	/if (${returnTwist}) {
 		/call unpauseTwist
-		
-	}	
+
+	}
   	/if (${Debug} || ${Debug_Casting})  /echo |- e3_Cast -| castReturn= ${Cast.Result} ${castReturn}
 
 
-	|to help with item clicks locking up, to give the server time to issue the cooldown.	
+	|to help with item clicks locking up, to give the server time to issue the cooldown.
 	/if (${Select[${castReturn},CAST_SUCCESS]} && ${pendingType.Equal[item]}) {
-	
+
 			|sometimes cooldowns are not just properly registered or there is a delay
-			|add small cooldown of default 2 seconds, unless we know the cooldown of the item 
+			|add small cooldown of default 2 seconds, unless we know the cooldown of the item
 			|and we just set it ourselves.
 			/call casting_ItemCooldown "${pendingCast}"
 			/declare itemRecastToUseInSeconds int ${Macro.Return}
@@ -542,13 +542,13 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 	|/varset Debug_Casting FALSE
 	|sometimes cast status gets locked up
 	|lets kill the current cast.
-	
+
 	|/echo Exiting e3_Cast with result : ${castReturn}
 /return
 
 
 sub CastAfterBeforeSpell(spellName)
-	
+
 	/if (${spellName.Length}>1) {
 		/declare spellItemReady bool local ${Me.ItemReady[${spellName}]}
 		/if (${Me.SpellReady[${spellName}]} || ${Me.AltAbilityReady[${spellName}]} || ${spellItemReady} ) {
@@ -556,14 +556,14 @@ sub CastAfterBeforeSpell(spellName)
 				|need to check if there is a cooldown on it
 				/declare spellItemID int local ${FindItem[${spellName}].ID}
 				/if (${Defined[SpellRecast_${spellItemID}]}) {
-							
+
 					/if (${SpellRecast_${spellItemID}}) {
 						|our timer is still active, skip this and say we are not recovered yet.
 						|No action taken, so they can cast the next thing in the list.
 						|/echo CastAfterBeforeSpell SpellRecast is on cooldown still for: ${SpellRecast_${spellItemID}} seconds
 						/return
 					}
-				} 
+				}
 			}
 			/call castSimpleSpell "${spellName}" 0
 		}
@@ -577,19 +577,19 @@ Sub check_Ready(ArrayName, int ArrayIndex)
   /if (${Debug} || ${Debug_Casting}) /echo |- check_Ready =>
   /varset c_Ready FALSE
   | Memorize the spell if it is not memorized
-  
+
   /if (${${ArrayName}[${ArrayIndex},${iCastType}].Equal[Spell]}) {
- 
+
     /if (!${Bool[${Me.Gem[${${ArrayName}[${ArrayIndex},${iCastName}]}]}]}) {
  		/call memorize_spell "${${ArrayName}[${ArrayIndex},${iCastName}]}" ${${ArrayName}[${ArrayIndex},${iSpellGem}]}
 	}
 	/if (${Me.SpellReady[${${ArrayName}[${ArrayIndex},${iCastName}]}]}) /varset c_Ready TRUE
- 
+
   } else /if (${${ArrayName}[${ArrayIndex},${iCastType}].Equal[Item]}) {
 	|Need to check if we already have this item on cooldown
 	/declare itemID int local ${FindItem[=${${ArrayName}[${ArrayIndex},${iCastName}]}].ID}
 	/if (${Defined[SpellRecast_${itemID}]}) {
-				
+
 		/if (${SpellRecast_${itemID}}) {
 			|our timer is still active, skip this and say we are not recovered yet.
 			|No action taken, so they can cast the next thing in the list.
@@ -598,11 +598,11 @@ Sub check_Ready(ArrayName, int ArrayIndex)
 			/goto :endOfCheckReady
 
 		}
-	} 
+	}
 	/if (${Me.ItemReady[=${${ArrayName}[${ArrayIndex},${iCastName}]}]}) {
 		/varset c_Ready TRUE
-	} 
-  
+	}
+
   } else /if (${${ArrayName}[${ArrayIndex},${iCastType}].Equal[AA]}) {
     /if (${Me.AltAbilityReady[${${ArrayName}[${ArrayIndex},${iCastName}]}]})  /varset c_Ready TRUE
   } else /if (${${ArrayName}[${ArrayIndex},${iCastType}].Equal[Disc]}) {
@@ -623,8 +623,8 @@ Sub check_ReadySimple(spellName, gemToUse)
   /if (${Debug} || ${Debug_Casting}) /echo |- check_ReadySimple =>
   /varset c_Ready FALSE
   | Memorize the spell if it is not memorized
-  
-	/declare spellType string local 
+
+	/declare spellType string local
 
 	/if (${Bool[${Me.AltAbility[${spellName}].Spell}]}) {
 		/varset spellType AA
@@ -633,7 +633,7 @@ Sub check_ReadySimple(spellName, gemToUse)
 	} else /if (${Me.CombatAbility[${spellName}]}) {
 		/varset spellType Disc
 	} else /if (${Me.Ability[${spellName}]}) {
-		/varset spellType Ability			
+		/varset spellType Ability
 	} else {
 		/varset spellType Item
 	}
@@ -650,7 +650,7 @@ Sub check_ReadySimple(spellName, gemToUse)
 	|Need to check if we already have this item on cooldown
 	/declare itemID int local ${FindItem[=${spellName}].ID}
 	/if (${Defined[SpellRecast_${itemID}]}) {
-				
+
 		/if (${SpellRecast_${itemID}}) {
 			|our timer is still active, skip this and say we are not recovered yet.
 			|No action taken, so they can cast the next thing in the list.
@@ -659,11 +659,11 @@ Sub check_ReadySimple(spellName, gemToUse)
 			/goto :check_ReadySimple
 
 		}
-	} 
+	}
 	/if (${Me.ItemReady[=${spellName}]}) {
 		/varset c_Ready TRUE
-	} 
-  
+	}
+
   } else /if (${spellType.Equal[AA]}) {
     /if (${Me.AltAbilityReady[${spellName}]})  /varset c_Ready TRUE
   } else /if (${spellType.Equal[Disc]}) {
@@ -681,18 +681,18 @@ Sub memorize_spell(spellName,gemNum)
   /if (${Debug} || ${Debug_Casting}) /echo |- memorize_spell =>
   	/memorize "${spellName}" ${gemNum}
 	/delay 5s ${Bool[${Me.Gem[${spellName}]}]}
-	
+
 	|only wait for beneficial,self spells
 	|(${Me.Combat} || ${Me.CombatState.Equal[Combat]} ||  ${AssistTarget} >0)
 	/declare isHealer bool Local ${Select[${Me.Class.ShortName},CLR,DRU,SHM]}
 	/declare timeTowait int local ${Math.Calc[35+(${Spell[${spellName}].RecastTime}/100)]}
 	 /if (${isHealer} && ${timeTowait}>30) {
         /varset timeTowait 30
-    } 
+    }
 	/declare waitForReady timer local ${timeTowait}
 	|/echo wfr ${waitForReady} rc ${Spell[${spellName}].RecastTime} math ${Math.Calc[25+(${Spell[${spellName}].RecastTime}/100)]}
 	:checkTimer
-		
+
 		|/echo chectimer ${waitForReady} ${Me.SpellReady[${spellName}]}
 	/if (${waitForReady}) {
 		/doevents Follow
@@ -701,7 +701,7 @@ Sub memorize_spell(spellName,gemNum)
 		/doevents BackOff
 		/doevents Assist
 		/call alerts_Background_Events
-		
+
 		/if ((${Me.Combat} || ${Me.CombatState.Equal[Combat]} ||  ${AssistTarget} >0)) {
 			|kick out as we are now in combat
 			/return
@@ -712,7 +712,7 @@ Sub memorize_spell(spellName,gemNum)
 			/goto :checkTimer
 		}
 	}
-	
+
   /if (${Debug} || ${Debug_Casting}) /echo |- memorize_spell <=
 /RETURN
 |------------------------------------------------|
@@ -753,14 +753,14 @@ Sub interrupt
     /varset interruptFlag TRUE
     /if (!${NetBots[${Me.Name}].Mounted}) {
         /interrupt
-    } 
+    }
 	|we don't leave this method unless the previous spell is stopped
 	|because of horses we just wait till the window is done, to preserve logic
 	|flow
 	/while (${Window[CastingWindow].Open}) {
 		/delay 1
 	}
-	
+
 
 /return
 
@@ -807,7 +807,7 @@ Sub casting_Setup
 	/declare noHoldDelay			int outer 600
 	/declare noHoldPetDelay   int outer 300
 	/declare closeCorpse			string outer FALSE
-	|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	
+	|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	/declare pendingCast				string outer
 	/declare pendingCastID			int outer
 	/declare lastSuccessfulCast	string outer
@@ -971,7 +971,7 @@ Sub casting_Setup
 
 
 	/declare index int local 1
-	/for index 1 to ${itemCooldownList.Size[1]} 
+	/for index 1 to ${itemCooldownList.Size[1]}
 		/if (${Bool[${FindItem[${itemCooldownList[${index},1]}]}]}) {
 			|found the item, add the name/index in the primary list to the temp list.
 			/varset tempItemLookupList[${tempItemLookupListCounter},1]  ${itemCooldownList[${index},1]}
@@ -981,10 +981,10 @@ Sub casting_Setup
 	/next index
 	|creating our final list of only the size we need
 	/declare itemCooldownLookupList[${Math.Calc[${tempItemLookupListCounter}-1]},2] string outer
-	
+
 	/if (${itemCooldownLookupList.Size[1]}>1) {
 
-		/for index 1 to ${itemCooldownLookupList.Size[1]} 
+		/for index 1 to ${itemCooldownLookupList.Size[1]}
 				|found the item, add the name/index in the primary list to the temp list.
 				/varset itemCooldownLookupList[${index},1]  ${tempItemLookupList[${index},1]}
 				/varset itemCooldownLookupList[${index},2]  ${tempItemLookupList[${index},2]}
@@ -998,7 +998,7 @@ Sub casting_Setup
 		/next index
 
 	}
-	
+
 
 /if (${Debug} || ${Debug_Casting}) /echo <== casting_Setup -|
 /return
@@ -1035,12 +1035,12 @@ SUB check_SpellGemLockup
 	/if (!${Me.AltAbilityReady[${UnlockSpell}]}) {
 		/varset UnlockSpell "Marr's Calling"
 	}
-	
+
 	|if we are stuck in this sitaution, delay for 0.3 sec to see if we will self correct before we do
 	|anything drastic
 	/while ((${Bool[${Me.Casting.ID}]} && !${Window[CastingWindow].Open} && !${Me.SpellInCooldown}) && ${checkCounter} < 3) {
 		/delay 1
-		/varcalc checkCounter ${checkCounter}+1 
+		/varcalc checkCounter ${checkCounter}+1
 	}
 
 	/if (${Bool[${Me.Casting.ID}]} && !${Window[CastingWindow].Open} && !${Me.SpellInCooldown}) {
@@ -1075,21 +1075,21 @@ sub castSimpleSpellBase(spellName, simpleTargetID, SkipParams)
 		|if 0 passed in, set it to whatever they are targeting
 		/varset simpleTargetID ${Target.ID}
 	}
-   	
+
 	/call BuildSingleSpellArrayBase "${spellName}" "castSimpleSpellArray2D" ${SkipParams}
-  
+
 	/call check_Ready "castSimpleSpellArray2D" 1
 	/declare checkReadyCounter int local 0
     /while (!${c_Ready}) {
-		
+
 		/delay 3
-		/call check_Ready "castSimpleSpellArray2D" 1		
+		/call check_Ready "castSimpleSpellArray2D" 1
 		/varcalc checkReadyCounter ${checkReadyCounter} +1
 		/if (${checkReadyCounter} > 6) {
 			/return
 		}
 	}
-	
+
     /call e3_Cast ${simpleTargetID} "castSimpleSpellArray2D" 1 False
     /while (${Select[${castReturn},CAST_FIZZLE]}) {
           /delay 1s

@@ -34,7 +34,7 @@
 SUB clearXTargets_Setup
 	/declare ClearXTargetsOn bool outer FALSE
 	/declare ClearXStick bool outer FALSE
-	/declare ClearXTargetsDebug bool outer FALSE
+	/declare ClearXTargetsDebug bool outer TRUE
   /declare NumAggroTargets int outer 0
   /declare KeepAggroOn bool outer FALSE
 
@@ -109,6 +109,33 @@ SUB event_clearXTargets(line, ChatSender, args)
 /RETURN
 
 | Selects the next target and attacks
+
+|#event nextTarget "<#1#> Next Target"
+SUB event_nextTarget(line, ChatSender)
+  /if (!${ChatSender.Equal[${Me.Name}]}) /return
+  /if (${Me.XTarget} == 0) /return
+
+  |/declare mobId int local ${NearestSpawn[npc].ID}
+	/declare mobId int local ${Me.XTarget[1].ID}
+
+  |/if (${mobId} <= 0) /varset mobId ${NearestSpawn[npc].ID}
+	/if (${mobId} <= 0) /varset mobId ${Me.XTarget[1].ID}
+  /if (${ClearXTargetsDebug}) /echo Assisting on Next Target ${Spawn[${mobId}].CleanName} TargetID=${mobId}
+  /call TrueTarget ${mobId}
+  /if (${ClearXStick}) /stick id ${mobId} ${ClearXTargetStickDistance} uw
+  |/delay 1
+	/echo ${Time}
+  /attack on
+  |/delay 1
+  |/bcga //pet attack
+	/echo ${Time}
+	/assistme
+  /varset AllowControl TRUE
+  /varset AssistStickDistance ${ClearXTargetStickDistance}
+
+  /doevent flush event_nextTarget
+/RETURN
+
 #event nextTarget "<#1#> Next Target"
 SUB event_nextTarget(line, ChatSender)
   /if (!${ChatSender.Equal[${Me.Name}]}) /return
@@ -168,14 +195,18 @@ SUB check_clearXTargets
   /varset NumAggroTargets 0
   /declare numLowAggroTargets int local 0
   /declare i int local 1
-  /for i 1 to 13
-    /if (${Me.XTarget[${i}].TargetType.Equal[Auto Hater]} && ${Me.XTarget[${i}].Aggressive}) {
-      /varset NumAggroTargets ${Math.Calc[${NumAggroTargets} + 1]}
-      /if (${Me.XTarget[${i}].PctAggro} < 100) {
-        /varset numLowAggroTargets ${Math.Calc[${numLowAggroTargets} + 1]}
-      }
-    }
-  /next i
+  |/for i 1 to 13
+  |  /if (${Me.XTarget[${i}].TargetType.Equal[Auto Hater]} && ${Me.XTarget[${i}].Aggressive}) {
+  |    /varset NumAggroTargets ${Math.Calc[${NumAggroTargets} + 1]}
+  |    /if (${Me.XTarget[${i}].PctAggro} < 100) {
+  |      /varset numLowAggroTargets ${Math.Calc[${numLowAggroTargets} + 1]}
+  |    }
+  |  }
+  |/next i
+
+	/if (${Me.XTarget[1].TargetType.Equal[Auto Hater]} && ${Me.XTarget[1].Aggressive}) {
+	/varset NumAggroTargets ${Math.Calc[${NumAggroTargets} + 1]}
+}
 
   /if (!${ClearXTargetsOn}) /return
 
@@ -187,6 +218,7 @@ SUB check_clearXTargets
     | If there are any aggro targets call Next Target
     | If there are none, disable Clear XTargets
     /if (${NumAggroTargets} > 0) {
+			/echo ${Time}
 			/bc Next Target
       /return
     }
@@ -194,8 +226,15 @@ SUB check_clearXTargets
   	| No target found, disable clearing
     /varset ClearXTargetsOn FALSE
     /echo ClearXTargets: XTargets Cleared, disabled Clear XTarget
-		/bc loot on
-
+		|/bc loot on
+		|/bct minty loot on
+		|/target 66 NPC
+		|/target 67 NPC
+		|/target 68 NPC
+		|/target NPC
+		|/bcga //nav spawn id ${Target.ID}
+		|/varset ClearXTargetsOn TRUE
+		|/varset ClearXStick TRUE
     /if (${FollowAfterClearXTargets}) {
       | If set to follow after clearing
 			/followme
@@ -208,8 +247,49 @@ SUB check_clearXTargets
   }
 /RETURN
 
+
+SUB check_clearXTargetsTEST
+  | Count the current number of aggro targets
+  /varset NumAggroTargets 0
+  /if (${Me.XTarget[1].TargetType.Equal[Auto Hater]} && ${Me.XTarget[1].Aggressive}) {
+	/varset NumAggroTargets ${Math.Calc[${NumAggroTargets} + 1]}
+}
+
+  /if (!${ClearXTargetsOn}) /return
+/echo ${Time} - YOU ARE HERE!
+  /if (!${Assisting} || ${Target.ID} == ${Me.ID}) {
+    | If there are any aggro targets call Next Target
+    | If there are none, disable Clear XTargets
+    /if (${NumAggroTargets} > 0) {
+			/echo ${Time} Num of Targets = ${Me.XTarget}
+			/if (${Me.XTarget} == 0) /return
+
+		  |/declare mobId int local ${NearestSpawn[npc].ID}
+			/declare mobId int local ${Me.XTarget[1].ID}
+
+			/if (${mobId} <= 0) /varset mobId ${Me.XTarget[1].ID}
+		  /if (${ClearXTargetsDebug}) /echo Assisting on Next Target ${Spawn[${mobId}].CleanName} TargetID=${mobId}
+			/echo ${Time} This is my target ${mobId}
+			|/call TrueTarget ${mobId}
+			/target ${Me.XTarget[1].ID}
+		  /attack on
+			/echo ${Time}
+			/assistme
+
+      /return
+    }
+
+  	| No target found, disable clearing
+    /varset ClearXTargetsOn FALSE
+    /echo ClearXTargets: XTargets Cleared, disabled Clear XTarget
+	  /attack off
+  }
+
+/RETURN
+
+
 | Selects the next target and attacks
-#event rotateTarget "<#1#> Rotate Target"
+|#event rotateTarget "<#1#> Rotate Target"
 SUB event_rotateTarget(line, ChatSender)
   /if (!${ChatSender.Equal[${Me.Name}]} || ${NumAggroTargets} == 0) /return
   /declare i int local

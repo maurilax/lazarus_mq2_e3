@@ -1533,6 +1533,16 @@ Sub basics_Setup
 	/if (${Ini[${genSettings_Ini},ExpGroup,NoKS_SpellSet].Length}) 			/call iniToVarV "${genSettings_Ini},ExpGroup,NoKS_SpellSet" NoKSSpellSet string outer
 	/if (${Ini[${genSettings_Ini},ExpGroup,KS_SpellSet].Length}) 				/call iniToVarV "${genSettings_Ini},ExpGroup,KS_SpellSet" KSSpellSet string outer
 
+  /call iniToVarV "${Character_Ini},Auto Shrink,Auto Shrink (On/Off)" autoShrink bool outer
+	/call IniToArrayV "${Character_Ini},Auto Shrink,Spell Name" shrinkSpell
+  /call iniToVarV "${Character_Ini},Auto Shrink,Size" shrinkSize float outer
+  /if (${Defined[shrinkSpell]}) /call BuildSpellArray "shrinkSpell" "shrinkSpell2D"
+
+	/call iniToVarV "${Character_Ini},Auto Shrink,Auto Shrink Group (On/Off)" autoShrinkGroup bool outer
+	/call IniToArrayV "${Character_Ini},Auto Shrink,Group Spell Name" groupShrinkSpell
+	/call iniToVarV "${Character_Ini},Auto Shrink,Size" shrinkSizeGroup float outer
+	/if (${Defined[groupShrinkSpell]}) /call BuildSpellArray "groupShrinkSpell" "groupShrinkSpell2D"
+
 	/declare MaxResponseDist int outer 250
 	/if (${Ini[${genSettings_Ini},General,Max Response Distance].Length} && ${Int[${Ini[${genSettings_Ini},General,Max Response Distance]}]}) /call iniToVarV "${genSettings_Ini},General,Max Response Distance" MaxResponseDist int outer
 
@@ -1604,6 +1614,8 @@ Sub basics_Background_Events
   /doevents manastoneToggle
   /doevents outOfSomething
   /doevents ItemDeleteSummoned
+  /doevents autoShrinkSelf
+  /doevents autoShrinkGroup
   /call check_StoneOn
 |		/varset event_counter 1
 |	} else {
@@ -1882,6 +1894,10 @@ sub event_gimme(line, ChatSender, RequestedItem)
     } else /if (${Bool[${RequestedItem.Find[Shuriken of Eternity]}]} && ${Bool[${FindItem[Ton Po's Mystical Pouch]}]}) {
       /if (${DebugGimme}) /echo casting Ton Po's Mystical Pouch
       /useitem "Ton Po's Mystical Pouch"
+    } else /if (${Bool[${RequestedItem.Find[Gold]}]} && ${Bool[${FindItem[Big Spender's Coin Purse]}]}) {
+      /if (${DebugGimme}) /echo casting Big Spender's Coin Purse
+      /useitem "Big Spender's Coin Purse"
+
 
 
 		} else {
@@ -2056,10 +2072,10 @@ SUB check_Gimme
 |----------------------------------------------------------------------------|
 SUB check_Supply
 	/if (${Debug}) /echo |- check_Supply ==>
+
   /if (${Waiting4Rez}) /return
   /if (${Bool[${Me.Buff[Resurrection Sickness]}]}) /return
 	/if (!${Defined[SupplyEnabled]}) /declare SupplyEnabled bool outer ${Bool[${Ini[${Character_Ini},Supply]}]}
-
   /if (!${SupplyEnabled}) /goto :endsupply
   /if (${Bool[${Cursor.ID}]}) /goto :endsupply
   /if (${Me.CombatState.Equal[DEBUFFED]}) /goto :endsupply
@@ -2070,8 +2086,7 @@ SUB check_Supply
   /if (${Assisting}) /goto :endsupply
   /if (${Me.PctAggro} > 0) /goto :endsupply
 
-  /if (${Me.PctMana} == 100 && ${Me.PctHPs} == 100 ) {
-
+    /if (${Me.PctHPs} == 100 && ${Me.PctHPs} == 100 ) {
     /if (!${Defined[Supply]}) /call IniToArrayV "${Character_Ini},Supply,Supply#" Supply
 		/declare i int local
 		/if (!${Defined[supplyItem]}) /declare supplyItem string local NULL

@@ -1,0 +1,95 @@
+| Mac tomepickup.mac v1.1 3/7/2022
+| Written by: Shen
+| Run on a toon in Tacvi to loot all the books off the remains
+| Requirements: MQ2Nav
+| v1.1 Added loop to open all bags to avoid 
+
+Sub Main
+
+	/declare NumTomes 	int outer 0
+	
+	/hidecorpse looted
+	
+	/if (${Me.FreeInventory}<14) {
+		/echo not enough slots on this character to pickup all the books, ending macro
+		/end
+	}
+
+	/while (${SpawnCount[chest]}>0) {
+		/varset LootTotal 0
+		/tar remains
+		/delay 1s ${Target.ID}
+	
+		/nav target
+		/delay 1s ${Me.Moving}
+		:MoveLoop
+		/if (${Me.Moving} && ${Nav.Active}) {
+			/delay 1s
+			/goto :MoveLoop
+		}
+		/if (${Target.Class.Name.Equal[Destructible Object]} && ${Target.Distance}<20 && !${Target.Dead}) {
+			/open
+		}
+		
+		/tar remains
+		/delay 1s ${Target.ID}
+		/loot
+		/delay 3s ${Window[LootWnd]}
+		/if (${Window[LootWnd].Open} && ${Corpse.Items}) {
+			/nomodkey /itemnotify ${Corpse.Item[writings].InvSlot} rightmouseup
+			/delay 1
+			/nomodkey /notify LootWnd LW_DoneButton leftmouseup
+			/delay 3s !${Window[LootWnd]}
+		}
+	}
+	
+	/if (${FindItemCount[writings]}<14) {
+		/beep
+		/beep
+		/beep
+		/echo checking inventory for which writing you're missing
+		/if (${FindItemCount[Absor's Writings]}==0) {
+			/echo Absor writings missing
+		}
+		/if (${FindItemCount[Frizznik's Writings]}==0) {
+			/echo Frizznik Writings missing
+		}
+		/if (${FindItemCount[Kaikachi's Writings]}==0) {
+			/echo Kaikachi writings missing
+		}
+		/if (${FindItemCount[Lyndro's Writings]}==0) {
+			/echo Lyndro's writings missing
+		}
+		/if (${FindItemCount[Maddoc's Writings]}==0) {
+			/echo Maddoc's writings missing
+		}
+		/if (${FindItemCount[Prathun's Writings]}==0) {
+			/echo Prathun's Writings missing
+		}
+		/if (${FindItemCount[Rashere's Writings]}==0) {
+			/echo Rashere's writings missing
+		}
+		/if (${FindItemCount[Rytan's Writings]}==0) {
+			/echo Rytan's writings missing
+		}
+		/if (${FindItemCount[Silius' Writings]}==0) {
+			/echo Silius' writings missing
+		}
+		/if (${FindItemCount[Vahlara's Writings]}==0) {
+			/echo Vahlara's writings missing
+		}
+		/if (${FindItemCount[Valtron's Writings]}==0) {
+			/echo Valtron's writings missing
+		}
+		/if (${FindItemCount[Wijdan's Writings]}==0) {
+			/echo Wijdan's writings missing
+		}
+		/if (${FindItemCount[Xenaida's Writings]}==0) {
+			/echo Xenaida's writings missing
+		}
+		/if (${FindItemCount[Zajeer's Writings]}==0) {
+			/echo Zajeer's writings missing
+		}
+	}
+/return
+

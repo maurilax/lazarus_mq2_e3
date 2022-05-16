@@ -60,6 +60,7 @@ sub Main
   /if (${fCheckInventory} && !${Me.FreeInventory}) {
     /echo No free inventory, ending!
     /beep
+    /g FULL Inventory
     /endmacro
   }
 
@@ -86,7 +87,7 @@ sub Event_Skillup(Line,SkillName,SkillPoints)
     /delay 1s ${Cursor.ID}
     /if (${Cursor.ID}) /call Clear_Cursor
     /beep
-    /g All Done!!
+    /g All Done!! Skill reached
     /endmacro
   }
 /return
@@ -98,6 +99,7 @@ sub Event_Trivial
     /delay 1s ${Cursor.ID}
     /if (${Cursor.ID}) /call Clear_Cursor
     /beep
+    /g All Done!! Trivial
     /endmacro
   }
 /return
@@ -107,13 +109,14 @@ sub Event_OutOfStuff
   /beep
   /beep
   /echo Out of ingredients
+  /g Out of ingredients
   /endmacro
 /return
 
 sub Clear_Cursor
   :start_clear
   /if (${Cursor.ID}) {
-    /if (${Select[${Cursor.ID},9686,16925,16933,8238,21612,21614,9686,10269,3061,3059,16929,9685,9686]}) {
+    /if (${Select[${Cursor.ID},9686,28799,16915,16923,16925,16933,8238,21612,21614,9686,10269,3061,3059,16929,9685,9686]}) {
       /destroy
       /delay 1s !${Cursor.ID}
       /goto :start_clear

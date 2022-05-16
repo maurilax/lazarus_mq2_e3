@@ -1,0 +1,29 @@
+#event OutOfStuff "You are missing some required components."
+
+Sub Main(gemNumber, delay)
+
+	:Loop
+	/if (${Cursor.ID}) /autoinv
+	/doevents
+	/if (${Me.PctMana} < 20) {
+		/sit on
+		/delay 1s
+		/goto :Loop
+	}
+	/delay ${delay}
+	/if (!${Me.SpellReady[${gemNumber}]}) {
+		/if (${Cursor.ID}) /autoinv
+		/goto :Loop
+	} else {
+		/target pc Mintman
+		/cast ${gemNumber}
+		/delay 1s !${Me.Casting.ID}
+		|/useitem "Corrupted Manastone"
+		/goto :Loop
+	}
+
+/return
+
+Sub Event_OutOfStuff
+/endmacro
+/return

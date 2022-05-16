@@ -1,0 +1,101 @@
+|----------------------------------------------------------------------------|
+|- The function "check_Shrink" will shrink you anytime it detects that your
+|- height is over the set limit. The function "check_GroupShrink" will shrink
+|- you, your group members, and pets anytime it detects that one of them is 
+|- over the set limit. Neither will cast if you are in PoK. It is recommended
+|- that only one of the two be set to "On" at a time.
+|- Install Instructions:
+|- 		Add these SUB's to the bottom of e3 Includes/e3_Basics.inc
+|-		Add the following variables to Sub basics_Setup
+|-			/call iniToVarV "${Character_Ini},Auto Shrink,Auto Shrink (On/Off)" autoShrink bool outer
+|-			/call IniToArrayV "${Character_Ini},Auto Shrink,Spell Name" shrinkSpell
+|-			/call iniToVarV "${Character_Ini},Auto Shrink,Size" shrinkSize float outer
+|-			/if (${Defined[shrinkSpell]}) /call BuildSpellArray "shrinkSpell" "shrinkSpell2D"
+|-	
+|-			/call iniToVarV "${Character_Ini},Auto Shrink,Auto Shrink Group (On/Off)" autoShrinkGroup bool outer
+|-			/call IniToArrayV "${Character_Ini},Auto Shrink,Group Spell Name" groupShrinkSpell
+|-			/call iniToVarV "${Character_Ini},Auto Shrink,Size" shrinkSizeGroup float outer
+|-			/if (${Defined[groupShrinkSpell]}) /call BuildSpellArray "groupShrinkSpell" "groupShrinkSpell2D"
+|-		Add following to SUB basics_Background_Events
+|-			/doevents autoShrinkSelf
+|-			/doevents autoShrinkGroup
+|-		Add subroutine check for the appropriate classes
+|-		in e3 Macro Inis/Advanced Settings.ini
+|-			ex: SHM Function#13=check_Shrink
+|-			ex: SHM Function#14=check_GroupShrink
+|-		Add settings to your character.ini
+|-			[Auto Shrink]
+|-			Auto Shrink (On/Off)=Off
+|-			Auto Shrink Group (On/Off)=On
+|-			Spell Name=Shrink
+|-			Group Spell Name=Group Shrink
+|-			Size=1.88
+|----------------------------------------------------------------------------|
+#event autoShrinkSelf "#1# tells you, 'shrink self toggle'"
+#event autoShrinkSelf "<#1#> shrink self toggle"
+#event autoShrinkSelf "#1# tells the group, 'shrink self toggle'"
+SUB event_autoShrinkSelf(line, ChatSender)
+	/if (!${Defined[shrinkSpell]}) /return
+
+	/if (${autoShrink}) {
+		/varset autoShrink FALSE
+	} else {
+		/varset autoShrink TRUE
+	}
+	
+	/if (${autoShrink}) {
+		/docommand ${ChatToggle} ${Me}: Auto Shrink Self On
+	} else {
+		/docommand ${ChatToggle} ${Me}: Auto Shrink Self Off
+	}
+/return
+
+#event autoShrinkGroup "#1# tells you, 'shrink group toggle'"
+#event autoShrinkGroup "<#1#> shrink group toggle"
+#event autoShrinkGroup "#1# tells the group, 'shrink group toggle'"
+SUB event_autoShrinkGroup(line, ChatSender)
+	/if (!${Defined[groupShrinkSpell]}) /return
+	
+	/if (${autoShrinkGroup}) {
+		/varset autoShrinkGroup FALSE
+	} else {
+		/varset autoShrinkGroup TRUE
+	}
+	
+	/if (${autoShrinkGroup}) {
+		/docommand ${ChatToggle} ${Me}: Auto Shrink Group On
+	} else {
+		/docommand ${ChatToggle} ${Me}: Auto Shrink Group Off
+	}
+/return
+
+SUB check_Shrink
+	/if (!${Defined[shrinkSpell]}) /return
+	
+	/if (${autoShrink} && !${Zone.ShortName.Equal[poknowledge]} && !${Me.Combat} && !${Me.Moving}) {
+		/call check_Ready "shrinkSpell2D" 1
+		/if (${c_Ready} && (${Me.Height} > ${shrinkSize})) {
+			/call e3_Cast ${Me.ID} "shrinkSpell2D" 1
+		}
+	}
+/return
+
+SUB check_GroupShrink
+	/if (!${Defined[groupShrinkSpell]}) /return
+
+	/if (${Group.Members} > 0 && ${autoShrinkGroup} && !${Zone.ShortName.Equal[poknowledge]} && !${Me.Combat} && !${Me.Moving}) {
+		/declare i int local 1
+		/declare g int local
+		/for g 0 to ${Group.Members} {
+			/call check_Ready "groupShrinkSpell2D" ${i}
+			/if (${c_Ready} && (${Group.Member[${g}].Height} > ${shrinkSizeGroup}) && ${check_Distance[${Group.Member[${g}].ID},${${groupShrinkSpell2D}[${i},${iMyRange}]}]}) {
+				/call e3_Cast ${Group.Member[${g}].ID} "groupShrinkSpell2D" ${i}
+			}
+			
+			/if (${Group.Member[${g}].Pet.ID} && ${c_Ready} && (${Group.Member[${g}].Pet.Height} > ${shrinkSizeGroup}) && ${check_Distance[${Group.Member[${g}].Pet.ID},${${groupShrinkSpell2D}[${i},${iMyRange}]}]}) {
+				/call e3_Cast ${Group.Member[${g}].Pet.ID} "groupShrinkSpell2D" ${i}
+			}
+		}
+		/next g
+	}
+/return

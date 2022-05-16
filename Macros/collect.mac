@@ -1,0 +1,15 @@
+#turbo
+Sub Main
+
+    /declare i int local
+    /for i 1 to ${Group.Members}
+			/target ${Group.Member[${i}]}
+			/bct ${Target.CleanName} //mac giveitems
+			/bct ${Target.CleanName} //target Mintman
+			/bct ${Target.CleanName} //giveitem pc gr stuffs
+      /delay 30s
+    /next i
+/keypress ctrl+r
+/RETURN
+
+/return

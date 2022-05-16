@@ -1,13 +1,13 @@
 #event OutOfStuff "You are missing some required components."
 
 Sub Main(gemNumber, delay)
-	
+
 	:Loop
 	/if (${Cursor.ID}) /autoinv
 	/doevents
 	/if (${Me.PctMana} < 20) {
 		/sit on
-		/delay 15s
+		/delay 1s
 		/goto :Loop
 	}
 	/delay ${delay}
@@ -22,6 +22,6 @@ Sub Main(gemNumber, delay)
 
 /return
 
-Sub Event_OutOfStuff 
-/endmacro 
+Sub Event_OutOfStuff
+/endmacro
 /return

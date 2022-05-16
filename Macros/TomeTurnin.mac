@@ -1,0 +1,157 @@
+| Mac tometurnin.mac v1.1 3/4/2022
+| Written by: Shen
+| Run on a toon in Abysmal Sea to turn in all the books to get the Tome of New Beginnings
+| Requirements: MQ2Nav, already be in Abysmal Sea
+| v1.1 Added loop to open all bags to avoid 
+
+Sub Main
+
+	/declare NumTomes 	int 0
+	
+	
+|Check for all 14 tomes before starting
+	/if (${FindItemCount[Absor's Writings]}>0) {
+		/varcalc NumTomes ${NumTomes}+1
+		/echo Absor writings found
+	}
+	/if (${FindItemCount[Frizznik's Writings]}>0) {
+		/varcalc NumTomes ${NumTomes}+1
+		/echo Frizznik Writings found
+	}
+	/if (${FindItemCount[Kaikachi's Writings]}>0) {
+		/varcalc NumTomes ${NumTomes}+1
+		/echo Kaikachi writings found
+	}
+	/if (${FindItemCount[Lyndro's Writings]}>0) {
+		/varcalc NumTomes ${NumTomes}+1
+		/echo Lyndro's writings found
+	}
+	/if (${FindItemCount[Maddoc's Writings]}>0) {
+		/varcalc NumTomes ${NumTomes}+1
+		/echo Maddoc's writings found
+	}
+	/if (${FindItemCount[Prathun's Writings]}>0) {
+		/varcalc NumTomes ${NumTomes}+1
+		/echo Prathun's Writings found
+	}
+	/if (${FindItemCount[Rashere's Writings]}>0) {
+		/varcalc NumTomes ${NumTomes}+1
+		/echo Rashere's writings found
+	}
+	/if (${FindItemCount[Rytan's Writings]}>0) {
+		/varcalc NumTomes ${NumTomes}+1
+		/echo Rytan's writings found
+	}
+	/if (${FindItemCount[Silius' Writings]}>0) {
+		/varcalc NumTomes ${NumTomes}+1
+		/echo Silius' writings found
+	}
+	/if (${FindItemCount[Vahlara's Writings]}>0) {
+		/varcalc NumTomes ${NumTomes}+1
+		/echo Vahlara's writings found
+	}
+	/if (${FindItemCount[Valtron's Writings]}>0) {
+		/varcalc NumTomes ${NumTomes}+1
+		/echo Valtron's writings found
+	}
+	/if (${FindItemCount[Wijdan's Writings]}>0) {
+		/varcalc NumTomes ${NumTomes}+1
+		/echo Wijdan's writings found
+	}
+	/if (${FindItemCount[Xenaida's Writings]}>0) {
+		/varcalc NumTomes ${NumTomes}+1
+		/echo Xenaida's writings found
+	}
+	/if (${FindItemCount[Zajeer's Writings]}>0) {
+		/varcalc NumTomes ${NumTomes}+1
+		/echo Zajeer's writings found
+	}
+	/if (${NumTomes} < 14) {
+		/echo You don't have all the books, rerun macro when you have 14 tomes to turn in
+		/echo ${NumTomes} tomes found
+		/end
+	}
+	
+	/keypress OPEN_INV_BAGS
+	|Order: Aprilia, Jenna, Sophia, Verna, Gizzmu, Irena, De`van
+	
+	/call MoveAndWait "Aprilia Marrow"
+	/call GiveBook "Prathun's Writings" 
+	/call MoveAndWait "Jenna Gurell"
+	/call GiveBook "Rashere's Writings" 
+	/call MoveAndWait "Sophia Florence"
+	/call GiveBook "Lyndro's Writings" 
+	/call MoveAndWait "Verna Abella"
+	/call GiveBook "Silius' Writings" 
+	/call MoveAndWait "Gizzmu the Wise"
+	/call GiveBook "Maddoc's Writings" 
+	/call MoveAndWait "Irena Pereira"
+	/call GiveBook "Absor's Writings" 
+	/call MoveAndWait "De`van Szostek"
+	/call GiveBook "Xenaida's Writings" 
+	/call GiveBook "Wijdan's Writings" 
+	/call GiveBook "Rytan's Writings" 
+	/call GiveBook "Kaikachi's Writings" 
+	/call GiveBook "Vahlara's Writings" 
+	/call GiveBook "Frizznik's Writings" 
+	/call GiveBook "Zajeer's Writings" 
+	/call GiveBook "Valtron's Writings" 
+	/delay 1s
+	/target npc "De`van Szostek"
+	/delay 1s
+	/say My task is complete.
+	
+/return
+
+Sub MoveAndWait (string MoveTarget)
+	/target clear
+	/delay 1s !${Target.ID}
+	/target npc ${MoveTarget}
+	/if (${MoveTarget.Equal[Aprilia Marrow]}) {
+		/nav locyxz -155 267 114
+		:StairWait
+		/delay 1s
+		/if (${Me.Moving} && ${Nav.Active}) {
+			/goto :StairWait
+		}
+	}
+	/nav target
+	/delay 1s ${Me.Moving}
+	
+	:MoveLoop
+	/if (${Me.Moving} && ${Nav.Active}) {
+		/delay 1s
+		/goto :MoveLoop
+	}
+	
+	/if (${Target.Distance}<10) {
+		/echo Arrived at ${MoveTarget}
+		/return
+	}
+/return
+
+Sub GiveBook (string BookToGive)
+	/if (${Cursor.ID}) /autoinventory
+	/delay 1s !${Cursor.ID}
+	/if (${Cursor.ID}) {
+		/echo Something stuck on cursor and can't autoinv, ending mac
+		/end
+	}
+	/itemnotify ${FindItem[${BookToGive}].InvSlot} leftmouseup
+	/delay 1s ${Cursor.Name.Equal[${BookToGive}]}
+	/target npc 
+	/delay 1s ${Target.ID}
+	/click left target
+	
+	
+	:GiveWnd
+	/if (!${Window[GiveWnd].Open}) {
+		/goto :GiveWnd
+	}
+	/notify GiveWnd GVW_Give_Button leftmouseup
+	/delay 1s !${Window[GiveWnd].Open}
+	
+|	/if (${Cursor.Name.Equal[${BookToGive}]}) {
+|		/echo Received book back, something is wrong, ending macro
+|	}
+/return

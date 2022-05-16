@@ -1,0 +1,70 @@
+
+
+#turbo
+Sub Main
+
+
+/declare SpellList[17] string outer
+
+;Shm
+;/varset SpellList[1] Wunshi's Focusing
+;/varset SpellList[2] Spirit of Perseverance
+;/varset SpellList[3] Spirit of Sense
+;/varset SpellList[4] Yoppa's Spear of Venom
+;/varset SpellList[5] Ancestral Bulwark
+;/varset SpellList[6] Spirit of Might
+;/varset SpellList[7] Spirit Veil
+;/varset SpellList[8] Pained Memory
+;/varset SpellList[9] Spirit of Fortitude
+;/varset SpellList[10] Talisman of Sense
+;/varset SpellList[11] Yoppa's Mending
+;/varset SpellList[12] Yoppa's Rain of Venom
+;/varset SpellList[13] Breath of Antraygus
+;/varset SpellList[14] Ice Age
+;/varset SpellList[15] Talisman of Fortitude
+;/varset SpellList[16] Hungry Plague
+;/varset SpellList[17] Talisman of Might
+;/varset SpellList[18] Vindictive Spirit
+
+
+;CLR
+/varset SpellList[1] Greater Reviviscence
+/varset SpellList[2] Shock of Wonder
+/varset SpellList[3] Sun Cloak
+/varset SpellList[4] Ward of Valiance
+/varset SpellList[5] Blessing of Devotion
+/varset SpellList[6] Panoply of Vie
+/varset SpellList[7] Reproach
+/varset SpellList[8] Sermon of Reproach
+/varset SpellList[9] Death's Regret
+/varset SpellList[10] Desolate Undead
+/varset SpellList[11] Hammer of Reproach
+/varset SpellList[12] Pious Light
+/varset SpellList[13] Calamity
+/varset SpellList[14] Ward of Retribution
+/varset SpellList[15] Armor of the Pious
+/varset SpellList[16] Balikor's Mark
+/varset SpellList[17] Puratus
+/varset SpellList[18] Silent Dictation
+
+;MNK
+;/varset SpellList[1] Dreamwalk Discipline
+;/varset SpellList[2] Counterforce Discipline
+;/varset SpellList[3] Dragon Fang
+;/varset SpellList[4] Crystalpalm Discipline
+
+;ROG
+;/varset SpellList[1] Imperceptible Discipline
+;/varset SpellList[2] Deadly Aim Discipline
+;/varset SpellList[3] Daggerfall
+
+    /declare i int local
+    /for i 1 to 18
+      /echo do i have ${SpellList[${i}]} ?
+			/echo ${Bool[${Me.Book[${SpellList[${i}]}]}]}
+;	    /echo ${Bool[${Me.CombatAbility[Crystalpalm Discipline]}]}
+
+    /next i
+/RETURN
+
+/return

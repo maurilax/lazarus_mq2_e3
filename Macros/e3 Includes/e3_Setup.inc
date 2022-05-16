@@ -131,7 +131,7 @@ SUB e3_Setup(modeSelect)
 
 	/call IniToArrayV  "${advSettings_Ini},Included Setups,Include#" macroSetups
 	/call IniToArrayV "${advSettings_Ini},${Me.Class.ShortName} Functions,${Me.Class.ShortName} Function#" mainLoop_Array
-	
+
   | Setup Includes ==========================================================================================================
   /declare i int local
 	/for i 1 to ${macroSetups.Size}
@@ -142,18 +142,18 @@ SUB e3_Setup(modeSelect)
 	/next i
   |Set Turbo per class based on configuration
   /if (${${IniMode}[${advSettings_Ini},Turbo,${Me.Class.ShortName}].Length}) /declare classTurbo int outer ${${IniMode}[${advSettings_Ini},Turbo,${Me.Class.ShortName}]}
-  
+
   /squelch /turbo ${classTurbo}
 
-	|Ewiclip: Adding auto-casting of Necromancer orb heals. 
+	|Ewiclip: Adding auto-casting of Necromancer orb heals.
 	/if (${Bool[${Ini[${Character_Ini},Heals]}]} && !${Bool[${Ini[${Character_Ini},Heals,Auto Cast Necro Heal Orbs (On/Off)]}]}) {
 		/call WriteToIni "${Character_Ini},Heals,Auto Cast Necro Heal Orbs (On/Off)" On
 	}
 
-	
+
 
 	/echo e3 loaded - Turbo ${classTurbo}
-	
+
 	/if (${Debug}) {
 		/echo
 		/echo *** Debug_Mode ON ***
@@ -161,7 +161,7 @@ SUB e3_Setup(modeSelect)
 		/echo
 		/mqpause
 	}
-/if (${Debug}) /echo <== e3_Setup -|	
+/if (${Debug}) /echo <== e3_Setup -|
 /RETURN
 
 |-------------------------
@@ -231,7 +231,7 @@ SUB EVENT_make_MacroSettingsIni
 		/if (${macroSetups[${i}].Equal[class]}) /varset macroSetups[${i}] ${Me.Class.ShortName}
 		/if (${Bool[${macroSetups[${i}]}]}) /call ${macroSetups[${i}]}_MacroSettings
 	/next i
-	
+
 	| Call class specific setups
 	/call BRD_MacroSettings
 	/call BST_MacroSettings
@@ -269,7 +269,7 @@ SUB EVENT_make_CharacterSettingsIni
 	/next i
 	/call WriteToIni "${MacroData_Ini},${Me.CleanName}-${serverNameForINI},Bot_Ini version" "${macroVersion}" 1
 /if (${Debug}) /echo <== make_CharacterSettingsIni -|
-/RETURN	
+/RETURN
 
 |------------------------------------------------------------|
 |- Deletes and Recreates aliases associated with e3.mac.	-|
@@ -281,7 +281,7 @@ SUB EVENT_updateAliases
 	/echo Updating macro aliases....
 	/echo (WARNING: Your clients will lock up for a few moments.  Stand fast, friend...)
 	/echo Aliases may not work properly until you restart MQ2 on ALL clients.
-	
+
 	| Core aliases
 	/squelch /alias /updateAliases /echo Update macro aliases
 	/squelch /alias /makeCharIni /echo Make Character Ini
@@ -292,9 +292,9 @@ SUB EVENT_updateAliases
 	/squelch /alias /debugoff /varset Debug 0
 
 	/call IniToArrayV "${advSettings_Ini},Included Setups,Include#" macroSetups
-	
+
 	/declare i int local
-	
+
 	/for i 1 to ${macroSetups.Size}
 		/if (${macroSetups[${i}].Equal[class]}) /varset macroSetups[${i}] ${Me.Class.ShortName}
 		/if (${Bool[${macroSetups[${i}]}]}) {
@@ -302,7 +302,7 @@ SUB EVENT_updateAliases
 			/delay 10
 		}
 	/next i
-	
+
 	/call BRD_Aliases
 	/call BST_Aliases
 	/call BER_Aliases
@@ -402,12 +402,12 @@ SUB check_Plugins
 				/echo ***WARNING*** Could not load MQ2Twist! Macro functionality may be limited.
 				/echo Bard melodies DISABLED.
 			}
-		}	
+		}
 	}
   |Check MQ2ItemDisplay.
 	/if (!${Plugin[mq2itemdisplay].Name.Length}) /plugin MQ2ItemDisplay
 	|Check MQ2LinkDB
-	/if (!${Plugin[MQ2LinkDB].Name.Length}) /plugin MQ2LinkDB
+	|/if (!${Plugin[MQ2LinkDB].Name.Length}) /plugin MQ2LinkDB
   |Check MQ2ITurbo
   /if (!${Plugin[mq2turbo].Name.Length}) {
     /plugin MQ2Turbo

@@ -135,10 +135,19 @@ SUB loot_Area
 
   /if (${Following}) {
     /call AcquireFollow
-    /g Done Looting
+    /g Done Looting FOLLOW ON
   } else {
     /call MoveToLoc ${startY} ${startX} 15 20
     /g Done Looting
+    |/delay 1s
+    |/nav spawn id ${NetBots[Mintman].TargetID}
+    |/delay 4s
+    |/bct mintman //target NPC
+    |/delay 1s
+    |/bcga //nav spawn id ${NetBots[Mintman].TargetID}
+    |/delay 1s
+		|/bct mintman //varset ClearXTargetsOn TRUE
+		|/bct mintman //varset ClearXStick TRUE
   }
   /docommand ${ChatToggle} ${Group.Leader} Looting Complete
   /if (${Debug} || ${Debug_Loot}) /echo <== loot_Area -|

@@ -26,7 +26,8 @@
 | CAST_DISTRACTED      | To Distracted ( spell book open )                                    |
 | CAST_COMPONENTS| Missing Component													                                |
 |---------------------------------------------------------------------------------------------|
-Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
+Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos, bool NoDelay)
+
 |StopEchos = Skips the /echo on successful cast if a value other than 0 is passed with the /call e3_Cast
 /if (${Debug} || ${Debug_Casting}) /echo |- e3_Cast ==>
 
@@ -134,16 +135,17 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 	|CatchAll Function for potentially locked up spell gems.
   	/call check_SpellGemLockup
 
-	/declare beforeSpell string local ${${ArrayName}[${ArrayIndex},${iBeforeSpell}]}
-	/if (${beforeSpell.Length}>1) {
-		/echo BeforeCast configured, calling "${beforeSpell}"
-		/call CastAfterBeforeSpell "${beforeSpell}"
-	}
 	/declare beforeEvent string local ${${ArrayName}[${ArrayIndex},${iBeforeEvent}]}
 	/if (${beforeEvent.Length}>1) {
 		/echo BeforeEvent configured, calling "${beforeEvent}"
 		/docommand ${beforeEvent}
 	}
+	/declare beforeSpell string local ${${ArrayName}[${ArrayIndex},${iBeforeSpell}]}
+	/if (${beforeSpell.Length}>1) {
+		/echo BeforeCast configured, calling "${beforeSpell}"
+		/call CastAfterBeforeSpell "${beforeSpell}"
+	}
+
 
 
 
@@ -378,7 +380,13 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 			} else {
 				/casting "${pendingCast}|${pendingType}"
 			}
-			/delay 3
+			/if (!${Bool[${NoDelay}]}) {
+
+				/delay 3
+			} else {
+
+				/echo <E3Cast> Casting without a delay! for ${pendingCast}
+			}
 			/declare castWindowWaitCounter int local 0
 			/if (${e3_CastTime}>500) {
 				/while (!${Window[CastingWindow].Open}) {
@@ -419,7 +427,13 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 			}
 
 			|delay 3 is enough time to have result come back with fizzle
-			/delay 3
+			/if (!${Bool[${NoDelay}]}) {
+
+				/delay 3
+			} else {
+
+				/echo <E3Cast> Casting without a delay! for ${pendingCast}
+			}
 			/declare castWindowWaitCounter int local 0
 			/if (${e3_CastTime}>500) {
 				/while (!${Window[CastingWindow].Open}) {
@@ -454,7 +468,10 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 				 /call ActivateSelosKick
 		   }
 
-
+		|-Check LifeSupport if more than 1.5 sec left to cast end
+			/if (${Defined[lifeSupport2D]}) {
+					/if (${Me.PctHPs}<70 && ${castEndTime}>15) /call check_lifeSupport
+			}
 			/if (${oldItem.Length} || ${e3_CastNoInterrupt}) {
 				/delay 1
 				/goto :cast_still_pending
@@ -498,7 +515,7 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 				}
 
 				|- Other reasons to cancel
-				/if (!${Assisting} && ${Following}) {
+				/if (!${Assisting} && ${Following} && !${Me.Class.ShortName.Equal[BRD]}) {
 				/if (${SpawnCount[=${FollowTarget}]} && ${Spawn[=${FollowTarget}].Distance} < ${LeashLength}) {
 					/if ((${Spawn[=${FollowTarget}].Distance} > 20 || ${NetBots[${FollowTarget}].Moving})) {
 					/if (${Debug} || ${Debug_Casting}) /echo following interrupt
@@ -545,10 +562,7 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 						/goto :skipCast
 					}
 				}
-						|-Check LifeSupport if more than 1.5 sec left to cast end
-						/if (${Defined[lifeSupport2D]}) {
-						/if (${Me.PctHPs}<70 && ${castEndTime}>15) /call check_lifeSupport
-				}
+
 				|-check only select background events
 						/doevents Follow
 						/doevents Stop
@@ -617,7 +631,9 @@ Sub e3_Cast(int targetID, ArrayName, int ArrayIndex, bool StopEchos)
 	}
 	/declare afterEvent string local ${${ArrayName}[${ArrayIndex},${iAfterEvent}]}
 	/if (${afterEvent.Length}>1) {
-		/echo AfterEvent configured, calling "${afterEvent}"
+		|give time for buffs to land, in case they want toi remove one.
+		/delay 5
+		/echo [${Time}] AfterEvent configured, calling "${afterEvent}"
 		/docommand ${afterEvent}
 	}
 
@@ -677,7 +693,14 @@ Sub check_Ready(ArrayName, int ArrayIndex)
     /if (!${Bool[${Me.Gem[${${ArrayName}[${ArrayIndex},${iCastName}]}]}]}) {
  		/call memorize_spell "${${ArrayName}[${ArrayIndex},${iCastName}]}" ${${ArrayName}[${ArrayIndex},${iSpellGem}]}
 	}
-	/if (${Me.SpellReady[${${ArrayName}[${ArrayIndex},${iCastName}]}]}) /varset c_Ready TRUE
+
+	/if ((${Bool[${Me.Gem[Focused Hail of Arrows]}]}  &&  ${Bool[${Me.Gem[Hail of Arrows]}]}) && (${${ArrayName}[${ArrayIndex},${iCastName}].Equal[Focused Hail of Arrows]} || ${${ArrayName}[${ArrayIndex},${iCastName}].Equal[Hail of Arrows]})) {
+		|spell hard coded as me.spelready returns true when one is on cooldown because of a timer of another.
+		/varset c_Ready TRUE
+		/if (!${Me.SpellReady[Focused Hail of Arrows]}) /varset c_Ready FALSE
+		/if (!${Me.SpellReady[Hail of Arrows]}) /varset c_Ready FALSE
+
+	} else /if (${Me.SpellReady[${${ArrayName}[${ArrayIndex},${iCastName}]}]}) /varset c_Ready TRUE
 
   } else /if (${${ArrayName}[${ArrayIndex},${iCastType}].Equal[Item]}) {
 	|Need to check if we already have this item on cooldown
@@ -693,7 +716,7 @@ Sub check_Ready(ArrayName, int ArrayIndex)
 
 		}
 	}
-	/if (${Me.ItemReady[=${${ArrayName}[${ArrayIndex},${iCastName}]}]}) {
+	/if (${Me.ItemReady[${${ArrayName}[${ArrayIndex},${iCastName}]}]}) {
 		/varset c_Ready TRUE
 	}
 
@@ -774,21 +797,23 @@ Sub check_ReadySimple(spellName, gemToUse)
 Sub memorize_spell(spellName,gemNum)
   /if (${Debug} || ${Debug_Casting}) /echo |- memorize_spell =>
   	/memorize "${spellName}" ${gemNum}
+
+	 /echo [${Time}] Delaying up to 5 seconds in memorize_spell
 	/delay 5s ${Bool[${Me.Gem[${spellName}]}]}
 
 	|only wait for beneficial,self spells
 	|(${Me.Combat} || ${Me.CombatState.Equal[Combat]} ||  ${AssistTarget} >0)
-	/declare isHealer bool Local ${Select[${Me.Class.ShortName},CLR,DRU,SHM]}
 	/declare timeTowait int local ${Math.Calc[35+(${Spell[${spellName}].RecastTime}/100)]}
-	 /if (${isHealer} && ${timeTowait}>30) {
-        /varset timeTowait 30
-    }
 	/declare waitForReady timer local ${timeTowait}
 	|/echo wfr ${waitForReady} rc ${Spell[${spellName}].RecastTime} math ${Math.Calc[25+(${Spell[${spellName}].RecastTime}/100)]}
 	:checkTimer
 
-		|/echo chectimer ${waitForReady} ${Me.SpellReady[${spellName}]}
+	/echo [${Time}] Delaying waiting for spell to memorize and to be ready in memorize_spell: ${spellName}
 	/if (${waitForReady}) {
+		/call check_HealCasting_DuringDetrimental
+		/if (!${c_SubToRun}) {
+			/return
+		}
 		/doevents Follow
 		/doevents Stop
 		/doevents MoveHere
@@ -1159,12 +1184,14 @@ SUB check_SpellGemLockup
 |--------------------------------------------------------------------------------------------|
 |- Used to call the e3_Cast for simple spells that cannot normally fail.                   	-|
 |--------------------------------------------------------------------------------------------|
-sub castSimpleSpell(spellNameToBase, simpleTargetIDToBase)
+sub castSimpleSpell(spellNameToBase, simpleTargetIDToBase, csNoDelay)
 
-    /call castSimpleSpellBase "${spellNameToBase}" ${simpleTargetIDToBase} True
+
+    /call castSimpleSpellBase "${spellNameToBase}" ${simpleTargetIDToBase} True ${Bool[${csNoDelay}]}
 
 /return
-sub castSimpleSpellBase(spellName, simpleTargetID, SkipParams)
+sub castSimpleSpellBase(spellName, simpleTargetID, SkipParams, csbNoDelay)
+
 
 	/if (${simpleTargetID}==0) {
 		|if 0 passed in, set it to whatever they are targeting
@@ -1185,10 +1212,10 @@ sub castSimpleSpellBase(spellName, simpleTargetID, SkipParams)
 		}
 	}
 
-    /call e3_Cast ${simpleTargetID} "castSimpleSpellArray2D" 1 False
+    /call e3_Cast ${simpleTargetID} "castSimpleSpellArray2D" 1 False  ${Bool[${csbNoDelay}]}
     /while (${Select[${castReturn},CAST_FIZZLE]}) {
           /delay 1s
-          /call e3_Cast  ${simpleTargetID} "castSimpleSpellArray2D" 1 False
+          /call e3_Cast  ${simpleTargetID} "castSimpleSpellArray2D" 1 False ${Bool[${csbNoDelay}]}
     }
 
 /return

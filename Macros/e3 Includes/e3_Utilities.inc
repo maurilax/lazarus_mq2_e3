@@ -561,9 +561,11 @@ SUB BuildSpellArrayBase(ArrayName, NewArrayName, SkipParams)
 	/declare printMin bool local False
 	|first loop through array to ensure i can identify all listed spells
 	/declare tmp_castname string local
+	/declare tmp_foundItem bool local false
 	|check to see if the spell/aa/etc actually exists.
 	/for i 1 to ${${ArrayName}.Size}
-		
+		/varset tmp_foundItem False
+
 		/varset tmp_castname ${${ArrayName}[${i}].Arg[1,/]}
 		|First check for super common items to ignore this
 		/if (!(${tmp_castname.Equal[Molten Orb]} || ${tmp_castname.Equal[Orb of Shadows]}|| ${tmp_castname.Equal[Orb of Souls]})) {
@@ -571,7 +573,14 @@ SUB BuildSpellArrayBase(ArrayName, NewArrayName, SkipParams)
 			/if (!(${Me.Book[${tmp_castname}]}||${Me.AltAbility[${tmp_castname}]}||${Me.CombatAbility[${tmp_castname}]}||${Me.Ability[${tmp_castname}]})) {
 				
 				|default to item - no way to validate an item thats on my corpse
-				/if (!${FindItem[=${tmp_castname}].ID}) {
+
+				|we are doing it this way in case the 'item' is an itemID instead
+				/if (${Int[${tmp_castname}]}>0) {
+					/varset tmp_foundItem ${Bool[${FindItem[${tmp_castname}].ID}]}
+				} else {
+					/varset tmp_foundItem ${Bool[${FindItem[=${tmp_castname}].ID}]}
+				}
+				/if (!${tmp_foundItem}) {
 
 					/if (!${Bool[${Me.Inventory[Chest]}]} && !${Me.Platinum}) {
 						/varset reloadOnLoot TRUE
@@ -581,7 +590,7 @@ SUB BuildSpellArrayBase(ArrayName, NewArrayName, SkipParams)
 						/varset reloadOnLoot TRUE
 						/varset missingSpellItem ${tmp_castname}
 						/bc [${${ArrayName}[${i}]}] : ${tmp_castname} i do not have this spell|aa|ability|disc|item accessible
-						/beep
+						|/beep
 						/call RemoveArrayElement "${ArrayName}" "${ArrayName}[${i}]"
 					}
 				}
@@ -612,7 +621,7 @@ SUB BuildSpellArrayBase(ArrayName, NewArrayName, SkipParams)
 		} else {
 			/varset ${NewArrayName}[${i},${iCastType}] Item
 		}
-		
+		|/echo ${${NewArrayName}[${i},${iCastName}]} type is: ${${NewArrayName}[${i},${iCastType}]}
 		|set the normal defaults
 		/varset ${NewArrayName}[${i},${iSpellGem}] ${DefaultGem}
 		/varset ${NewArrayName}[${i},${iMaxTries}] 5
@@ -851,9 +860,21 @@ SUB BuildSpellArrayBase(ArrayName, NewArrayName, SkipParams)
 			|Instead of calling FindItem 12 times, we call it twice and get a direct reference to the item in question
 
 			| ${Me.Inventory[23].Item[7].Spell.TargetType}
-			/varset invSlot ${FindItem[=${${NewArrayName}[${i},${iCastName}]}].ItemSlot}
-			/varset bagSlot ${FindItem[=${${NewArrayName}[${i},${iCastName}]}].ItemSlot2}
 
+			|check to see if its an itemID, and thus we need to do a non exact query
+			/if (${Int[${${NewArrayName}[${i},${iCastName}]}]}>0) {
+				
+				/varset invSlot ${FindItem[${${NewArrayName}[${i},${iCastName}]}].ItemSlot}
+				/varset bagSlot ${FindItem[${${NewArrayName}[${i},${iCastName}]}].ItemSlot2}
+
+			} else {
+				
+				/varset invSlot ${FindItem[=${${NewArrayName}[${i},${iCastName}]}].ItemSlot}
+				/varset bagSlot ${FindItem[=${${NewArrayName}[${i},${iCastName}]}].ItemSlot2}
+
+			}
+		
+			|/echo ${${NewArrayName}[${i},${iCastName}]} inv slot: ${invSlot} bag slot: ${bagSlot}
 			/if (${bagSlot}==-1) {
 				|/echo root item: id:${invSlot} :${${ArrayName}[${i}].Arg[1,/]}
 				|Means this is not in a bag and in the root inventory
@@ -1250,7 +1271,7 @@ SUB ClearCursor
       /popup ${Me.Name} cannot clear cursor, ending macro
       /endmacro
     } else {
-      /delay 1s !${Cursor.ID}
+      /delay 3s !${Cursor.ID}
     }
     /varcalc i ${i}+1
     /goto :check_cursor
@@ -1303,6 +1324,40 @@ SUB MoveToLoc(yLoc,xLoc,timeToWait,arrivalDist)
   } else /if (${moveTimer}) {
   	/goto :retryMove
 	} else /moveto off
+/return
+|-------------------------------------------------------------|
+|- Use MQ2MoveUtils /moveto function, to move to destination.	||
+SUB MoveToTarget(timeToWait,arrivalDist)
+  
+  
+  	/if (!${Bool[${arrivalDist}]}) /varset arrivalDist 10
+	/if (!${Bool[${timeToWait}]}) /varset timeToWait 30
+	/declare moveTimer timer local ${timeToWait}
+	|/echo MoveToLoc ${yLoc},${xLoc},${timeToWait},${arrivalDist}
+	/if (${Math.Distance[${yLoc},${xLoc}]}<=${arrivalDist}) /return
+	/if (${Bool[${Navigation.MeshLoaded}]}) {
+		/echo <MoveToTarget> Naving to target...
+		/if (${Me.Casting.ID} && ${Me.Class.ShortName.NotEqual[BRD]}) /call interrupt
+		/nav target
+		/delay 3
+		/delay ${timeToWait} !${Navigation.Active}
+		/return
+		
+	} else {
+		/echo <MoveToTarget> using /moveto to target...
+		/if (${Me.Casting.ID} && ${Me.Class.ShortName.NotEqual[BRD]}) /call interrupt
+		/squelch /moveto loc ${yLoc} ${xLoc} dist ${arrivalDist}
+		:retryMove
+		/call Background_Events
+		/delay ${Math.Calc[${timeToWait}/5]} ${Math.Distance[${yLoc},${xLoc}]} <=${arrivalDist}
+		/if (${Math.Distance[${yLoc},${xLoc}]}<=${arrivalDist}) {
+			/moveto off
+			/return
+		} else /if (${moveTimer}) {
+			/goto :retryMove
+			} else /moveto off
+	}
+    
 /return
 |--------------------------------------------------------------------------|
 |- Type Stuff
@@ -1554,3 +1609,89 @@ SUB Build_Class_Ini(Ini_File)
 SUB event_sendInstanceInvites(line, ChatSender)
 	/dzadd ${ChatSender}
 /return
+
+|----------------------------------------------------------------------------|
+|- Sanity check for when Waiting4Rez may fail								-|
+|----------------------------------------------------------------------------|
+|- Checks inventory and equipment to determine if player might be dead   	-|
+|----------------------------------------------------------------------------|
+sub check_AmIDead_Default
+    
+    /call check_AmIDead 1 1
+
+/return ${Macro.Return}
+
+
+sub check_AmIDead(int equipmentThreshold, int inventoryThreshold)
+/if (${Debug}) /echo [${Time}]: check_AmIDead
+
+    /if (!${Defined[missingEquipment]}) /declare missingEquipment bool local
+    /if (!${Defined[missingInventory]}) /declare missingInventory bool local
+
+    /call check_MissingEquipment ${equipmentThreshold}
+    /varset missingEquipment ${Macro.Return}
+    /call check_MissingInventory ${inventoryThreshold}
+    /varset missingInventory ${Macro.Return}
+    /if (${Debug}) /echo [${Time}]: check_AmIDead: Equipment ${missingEquipment}, Inventory: ${missingInventory}
+    /if (!(${missingEquipment} && ${missingInventory})) {
+        /return false
+    }
+
+/if (${Debug}) /echo [${Time}]: check_AmIDead: Check failed, character may be dead.
+/return true
+|----------------------------------------------------------------------------|
+|-    Equipment 															-|
+|- 1. A mage could summon mod rod in toons proximity, causing the toon to   -|
+|-	  autoinventory it to their mainhand - skip No Rent items 				-|
+|- 2. A player could intentionally have removed an item in any slot for 	-|
+|-	  reasons of their own choosing 										-|
+|- 3. Its common for players to not have offhand (14), powersource (21) or  -|
+|-	  ammo (22)																-|
+|----------------------------------------------------------------------------|
+sub check_MissingEquipment(int threshold)
+/if (${Debug}) /echo [${Time}]: check_MissingEquipment: Start
+
+    /declare i int local 
+    /declare equipmentFound int local
+
+    /for i 0 to 20
+    /if (${i} == 14) /continue
+    /if (${Bool[${InvSlot[${i}].Item.ID}]} && !${Bool[${InvSlot[${i}].Item.NoRent}]}) {
+        /varset equipmentFound ${Math.Calc[${equipmentFound}+1]}
+        /if (${Debug}) /echo [${Time}]: check_MissingEquipment: Item ${InvSlot[${i}].Item.Name} found found in slot: ${InvSlot[${i}]}
+    }
+    
+    /if (${equipmentFound} >= ${threshold}) {
+        /if (${Debug}) /echo [${Time}]: check_MissingEquipment: PASSED
+        /return false
+    } 
+    /next i
+
+/if (${Debug}) /echo [${Time}]: check_MissingEquipment: FAILED
+/return true
+|----------------------------------------------------------------------------|
+|- 	  Inventory 															-|
+|- 1. Going to assume if you have 1 bag or item PASS 						-|
+|- 2. Ignore No Rent items and Folded Packs. These can be summoned onto 	-|
+|- 	  your cursor by other players. 										-|
+|----------------------------------------------------------------------------|
+sub check_MissingInventory(int threshold)
+/if (${Debug}) /echo [${Time}]: check_MissingInventory Start
+
+    /declare i int local
+    /declare inventoryFound int local
+
+    /for i 1 to 10
+    /if (${Bool[${InvSlot[pack${i}].Item.ID}]} && !${Bool[${InvSlot[pack${i}].Item.NoRent}]} && !${Bool[${InvSlot[pack${i}].Item.Name.Find[Folded Pack]}]}) {
+        /varset inventoryFound ${Math.Calc[${inventoryFound}+1]}
+        /if (${Debug}) /echo [${Time}]: check_MissingInventory: Found bag or item ${InvSlot[pack${i}].Item.Name} in slot ${i}
+    }
+
+    /if (${inventoryFound} >= ${threshold}) {
+        /if (${Debug}) /echo [${Time}]: check_MissingInventory: PASSED
+        /return false
+    }
+    /next i
+
+/if (${Debug}) /echo [${Time}]: check_MissingInventory: FAILED
+/return true

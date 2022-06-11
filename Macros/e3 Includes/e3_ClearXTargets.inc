@@ -157,6 +157,7 @@ SUB event_nextTarget(line, ChatSender)
     /if (${ClearXTargetsDebug}) /echo Assisting on Next Target ${Spawn[${mobId}].CleanName} TargetID=${mobId}
     /call TrueTarget ${mobId}
     /if (${ClearXStick}) /stick id ${mobId} ${ClearXTargetStickDistance} uw
+		/face fast id ${mobId}
   |  /delay 1
     /attack on
     /assistme

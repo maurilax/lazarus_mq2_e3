@@ -1,10 +1,9 @@
 .DS_Store
 *.json
 MQ2AutoLogin.ini
-
 *.dll
 *.navmesh
 *.exe
 Macros/KA-shen.zip
-*.bat
 *.log
+*.dmp
